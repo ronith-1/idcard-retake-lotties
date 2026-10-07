@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IDCard Retake Lotties — Test Bench</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+<style>
+:root{
+  --bg:#f4f5f7; --panel:#fff; --line:#e4e6ea; --line-soft:#eef0f3;
+  --ink:#16181d; --ink-2:#5b6270; --ink-3:#8c93a1;
+  --accent:#00c1a2; --accent-ink:#008f79;
+  --stage:#eceef1;
+  --r:14px;
+  --shadow:0 1px 2px rgba(16,20,30,.04), 0 6px 20px rgba(16,20,30,.06);
+  /* Fixed light UI: every animation paints its own opaque bg plate. */
+  color-scheme:light;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+img{max-width:100%}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* ---------- top bar ---------- */
+.bar{
+  position:sticky;top:0;z-index:40;
+  background:color-mix(in srgb, var(--panel) 88%, transparent);
+  backdrop-filter:saturate(1.6) blur(14px);
+  border-bottom:1px solid var(--line);
+  padding:calc(12px + env(safe-area-inset-top,0px)) 20px 12px;
+}
+.bar-in{max-width:1480px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;gap:1px;margin-right:auto;min-width:0}
+.brand h1{margin:0;font-size:15px;font-weight:650;letter-spacing:-.01em;white-space:nowrap}
+.brand span{font-size:12px;color:var(--ink-3)}
+
+.seg{display:flex;align-items:center;gap:2px;background:var(--stage);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{padding:5px 11px;border-radius:7px;font-size:12.5px;font-weight:550;color:var(--ink-2);white-space:nowrap}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(16,20,30,.10)}
+
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:8px 13px;border-radius:10px;border:1px solid var(--line);
+  background:var(--panel);font-size:12.5px;font-weight:550;color:var(--ink);
+  transition:border-color .15s, transform .08s;
+}
+.btn:hover{border-color:var(--ink-3)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#03231d}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn:disabled{opacity:.45;cursor:default;filter:none;transform:none}
+.btn.icon{padding:8px;width:34px;justify-content:center}
+
+/* ---------- card picker ---------- */
+.picker{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  padding:16px;margin:0 0 22px;border:1px solid var(--line);border-radius:var(--r);
+  background:var(--panel);box-shadow:var(--shadow);
+}
+.picker-thumb{
+  width:168px;aspect-ratio:1.6;border-radius:10px;background:var(--stage);
+  border:1px solid var(--line-soft);object-fit:cover;display:block;flex:none;
+}
+.picker-meta{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.picker-meta small{font-size:11px;font-weight:620;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.picker-meta b{font-size:18px;font-weight:650;letter-spacing:-.015em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.picker-meta span{font-size:12.5px;color:var(--ink-3)}
+.picker-actions{display:flex;align-items:center;gap:8px}
+
+.dd{position:relative}
+.dd-btn svg{transition:transform .15s}
+.dd-btn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.dd-menu{
+  position:absolute;top:calc(100% + 6px);right:0;z-index:50;width:200px;max-height:360px;overflow:auto;
+  margin:0;padding:5px;list-style:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 12px 32px rgba(16,20,30,.16);transform-origin:top right;animation:pop .14s ease-out;
+}
+@keyframes pop{from{opacity:0;transform:scale(.97)}}
+.dd-menu button{
+  display:flex;align-items:center;gap:10px;width:100%;padding:6px;border-radius:8px;text-align:left;font-size:12.5px;font-weight:550;
+}
+.dd-menu button:hover,.dd-menu button:focus-visible{background:var(--stage);outline:none}
+.dd-menu button[aria-selected="true"]{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent-ink)}
+.dd-menu img{width:48px;height:30px;border-radius:5px;object-fit:cover;flex:none;background:var(--stage);border:1px solid var(--line-soft)}
+.dd-menu span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+@media (max-width:560px){
+  .picker-thumb{width:100%}
+  .picker-actions{width:100%}
+  .picker-actions .dd{flex:1}
+  .picker-actions .dd-btn{width:100%;justify-content:space-between}
+}
+
+/* ---------- grid ---------- */
+.layout{max-width:1480px;margin:0 auto;padding:22px 20px 64px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:28px;align-items:start}
+
+/* ---------- versions TOC ---------- */
+.toc{position:sticky;top:84px}
+.toc-label{font-size:11px;font-weight:620;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:6px 0 10px 12px}
+.toc ol{list-style:none;margin:0;padding:0;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
+.toc li{margin-left:-1px}
+.toc-item{
+  display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;text-align:left;
+  padding:8px 12px;border-left:2px solid transparent;border-radius:0 9px 9px 0;
+  transition:background .14s,border-color .14s,color .14s;
+}
+.toc-item b{font-size:13px;font-weight:600;color:var(--ink-2)}
+.toc-item small{font-size:11.5px;color:var(--ink-3)}
+.toc-item:hover{background:color-mix(in srgb,var(--ink) 4%,transparent)}
+.toc-item:hover b{color:var(--ink)}
+.toc-item[aria-current="true"]{border-left-color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.toc-item[aria-current="true"] b{color:var(--ink)}
+
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr;gap:16px}
+  .toc{position:static}
+  .toc-label{margin-left:0}
+  .toc ol{flex-direction:row;flex-wrap:wrap;border-left:0;gap:8px}
+  .toc li{margin-left:0}
+  .toc-item{border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+  .toc-item[aria-current="true"]{border-color:var(--accent)}
+}
+.meta-row{display:flex;align-items:baseline;gap:10px;margin:0 0 16px;flex-wrap:wrap}
+.meta-row h2{margin:0;font-size:20px;font-weight:660;letter-spacing:-.02em}
+.meta-row span{font-size:12.5px;color:var(--ink-3)}
+.meta-row{align-items:center}
+.ver-dl{margin-left:auto;display:flex;gap:8px}
+.ver-dl a{text-decoration:none}
+.play-seg{width:max-content;margin:-6px 0 16px}
+
+.grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+@media (max-width:560px){.grid{grid-template-columns:1fr;gap:14px}}
+
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;
+  transition:border-color .16s, box-shadow .16s, transform .16s;
+}
+.card:hover{border-color:color-mix(in srgb,var(--ink-3) 55%,transparent);box-shadow:0 2px 4px rgba(16,20,30,.05),0 14px 34px rgba(16,20,30,.10)}
+
+.card-head{display:flex;align-items:center;gap:8px;padding:11px 13px 9px}
+.card-title{font-size:13px;font-weight:620;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.pill{
+  flex:none;font-variant-numeric:tabular-nums;font-size:11px;font-weight:600;
+  padding:3px 8px;border-radius:99px;background:var(--stage);color:var(--ink-2);border:1px solid var(--line-soft);
+}
+
+.stage{
+  position:relative;background:var(--stage);border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);
+  aspect-ratio:654/336;cursor:zoom-in;
+}
+.stage>div{position:absolute;inset:0}
+.stage svg{display:block;width:100%!important;height:100%!important}
+.expand{
+  position:absolute;top:8px;right:8px;z-index:2;
+  width:28px;height:28px;border-radius:8px;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--panel) 82%, transparent);backdrop-filter:blur(8px);
+  border:1px solid var(--line);opacity:0;transition:opacity .16s;color:var(--ink-2);
+}
+.card:hover .expand,.expand:focus-visible{opacity:1}
+
+/* ---------- transport ---------- */
+.transport{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.tbtn{
+  width:30px;height:30px;border-radius:9px;display:grid;place-items:center;flex:none;
+  color:var(--ink);border:1px solid transparent;transition:background .14s,border-color .14s;
+}
+.tbtn:hover{background:var(--stage)}
+.tbtn[aria-pressed="true"]{color:var(--accent-ink);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.tbtn svg{width:16px;height:16px;display:block}
+
+.scrub{
+  -webkit-appearance:none;appearance:none;flex:1;min-width:0;height:18px;background:none;cursor:pointer;
+}
+.scrub::-webkit-slider-runnable-track{
+  height:4px;border-radius:99px;
+  background:linear-gradient(to right,var(--accent) var(--pct,0%),var(--line) var(--pct,0%));
+}
+.scrub::-moz-range-track{height:4px;border-radius:99px;background:var(--line)}
+.scrub::-moz-range-progress{height:4px;border-radius:99px;background:var(--accent)}
+.scrub::-webkit-slider-thumb{
+  -webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--panel);
+  border:2px solid var(--accent);margin-top:-4px;box-shadow:0 1px 3px rgba(0,0,0,.2);
+  transition:transform .12s;
+}
+.scrub:active::-webkit-slider-thumb{transform:scale(1.25)}
+.scrub::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--panel);border:2px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.time{font-size:11px;font-variant-numeric:tabular-nums;color:var(--ink-3);flex:none;letter-spacing:-.01em}
+
+/* ---------- modal ---------- */
+.overlay{
+  position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:24px;
+  background:color-mix(in srgb,#0b0d10 62%,transparent);backdrop-filter:blur(6px);
+  animation:fade .18s ease;
+}
+@keyframes fade{from{opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(10px) scale(.99)}}
+.sheet{
+  width:min(980px,100%);max-height:100%;overflow:auto;background:var(--panel);
+  border:1px solid var(--line);border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.4);
+  animation:rise .22s cubic-bezier(.2,.8,.3,1);
+}
+.sheet-head{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.sheet-head h3{margin:0;font-size:15px;font-weight:650;letter-spacing:-.015em;flex:1;min-width:0}
+.sheet .stage{cursor:default;border-radius:0}
+.sheet .transport{padding:14px 16px;gap:12px}
+.sheet .tbtn{width:34px;height:34px}
+.sheet .tbtn svg{width:18px;height:18px}
+.sheet .time{font-size:12px}
+
+.hint{margin:18px 0 0;font-size:12px;color:var(--ink-3);text-align:center}
+.hint kbd{font:inherit;font-size:11px;padding:1px 5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;background:var(--panel)}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="brand">
+      <h1>IDCard Retake Lotties</h1>
+      <span id="sub">— animations</span>
+    </div>
+
+    <div class="seg" role="group" aria-label="Loop">
+      <button id="loopAll" aria-pressed="true">Loop all</button>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+<nav class="toc" aria-label="Versions">
+  <div class="toc-label">Versions</div>
+  <ol id="versions"></ol>
+</nav>
+<main>
+  <section class="picker" aria-label="Card image">
+    <img id="thumb" class="picker-thumb" alt="">
+    <div class="picker-meta">
+      <small>Card image</small>
+      <b id="imgName">Placeholder card</b>
+      <span><span id="imgDim">generated</span> · <span id="imgHint">pick a sample card, or drop an image anywhere</span></span>
+    </div>
+    <div class="picker-actions">
+      <div class="dd">
+        <button class="btn dd-btn" id="sampleBtn" aria-haspopup="listbox" aria-expanded="false">
+          Sample cards
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <ul class="dd-menu" id="sampleMenu" role="listbox" aria-label="Sample cards" hidden></ul>
+      </div>
+      <button class="btn primary" id="apply" disabled>Apply to all</button>
+      <button class="btn icon" id="reset" title="Reset to placeholder" aria-label="Reset to placeholder">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+      </button>
+    </div>
+  </section>
+  <div class="meta-row">
+    <h2 id="verTitle">Preview grid</h2>
+    <span>Click a preview to open it large.</span>
+    <div class="ver-dl" id="verDl"></div>
+  </div>
+  <div class="seg play-seg" role="group" aria-label="Playback">
+    <button id="playAll">Play all</button>
+    <button id="pauseAll">Pause all</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <p class="hint">In the large view: <kbd>space</kbd> play / pause · <kbd>←</kbd> <kbd>→</kbd> step a frame · <kbd>esc</kbd> close</p>
+</main>
+</div>
+
+<script>
+const DATA = /*__ANIMS__*/null;          // {versions:[{label, anims:[{name,data}], downloads?:[{label,href}]}], samples:[path]}
+
+/* ---------------- image plumbing ---------------- */
+
+/* Draw a source image into exactly w×h using cover-crop, so the uploaded
+   picture keeps its aspect ratio inside the Lottie's fixed asset box. */
+function cover(img, w, h){
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const x = c.getContext('2d');
+  const s = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+  const dw = img.naturalWidth * s, dh = img.naturalHeight * s;
+  x.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+  return c.toDataURL('image/png');
+}
+
+/* Neutral stand-in for the missing card.png — a generic ID card. */
+function placeholderCard(w, h){
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d'), u = w / 100;
+  x.fillStyle = '#e7e9ec'; x.fillRect(0, 0, w, h);
+  x.fillStyle = '#d3d7dd'; x.fillRect(6*u, 18*u, 26*u, 34*u);           // photo
+  x.fillStyle = '#d9dde2';
+  [[38,20,48],[38,30,40],[38,40,44],[6,62,86],[6,72,62]].forEach(([lx,ly,lw]) =>
+    x.fillRect(lx*u, ly*u, lw*u, 5*u));
+  return c.toDataURL('image/png');
+}
+
+/* glare.png is also absent from the archives — synthesise the streak. */
+function placeholderGlare(w, h){
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, h, w, 0);
+  g.addColorStop(0,   'rgba(255,255,255,0)');
+  g.addColorStop(.40, 'rgba(255,255,255,0)');
+  g.addColorStop(.50, 'rgba(255,255,255,.55)');
+  g.addColorStop(.60, 'rgba(255,255,255,0)');
+  g.addColorStop(1,   'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, w, h);
+  return c.toDataURL('image/png');
+}
+
+const state = { img: null, loopAll: true };
+const cache = new Map();                       // "id@wxh" -> dataURI
+
+function assetURI(a){
+  const key = (state.img ? 'u' : 'p') + a.id + a.w + 'x' + a.h;
+  if (!cache.has(key))
+    cache.set(key, state.img ? cover(state.img, a.w, a.h)
+            : a.id === 'glare' ? placeholderGlare(a.w, a.h)
+            : placeholderCard(a.w, a.h));
+  return cache.get(key);
+}
+
+/* Inline every image asset as a data URI so nothing is fetched at runtime. */
+function withImage(def){
+  const d = structuredClone(def.data);
+  for (const a of d.assets || []) {
+    if (a.p === undefined || a.id === undefined || !a.w || a.p.startsWith('data:')) continue;
+    a.p = assetURI(a); a.u = ''; a.e = 1;
+  }
+  return d;
+}
+
+/* ---------------- per-animation player ---------------- */
+
+const fmt = s => s.toFixed(2) + 's';
+const ICON = {
+  play:  '<path d="M7 4.5v15l13-7.5z"/>',
+  pause: '<path d="M7 4.5h4v15H7zM14 4.5h4v15h-4z"/>',
+  stop:  '<rect x="6" y="6" width="12" height="12" rx="1.5"/>',
+  loop:  '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 12v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 12v1a4 4 0 0 1-4 4H3"/></g>'
+};
+const svg = p => `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${p}</svg>`;
+
+/* Builds the play / loop / scrubber row and binds it to a lottie instance.
+   `loopBtn:false` for the modal, which inherits the card's loop setting. */
+function transport(host, get, opts = {}){
+  const el = document.createElement('div');
+  el.className = 'transport';
+  el.innerHTML =
+    `<button class="tbtn" data-act="play" aria-label="Play">${svg(ICON.pause)}</button>` +
+    `<button class="tbtn" data-act="stop" aria-label="Stop">${svg(ICON.stop)}</button>` +
+    (opts.loopBtn === false ? '' :
+      `<button class="tbtn" data-act="loop" aria-label="Loop" aria-pressed="true">${svg(ICON.loop)}</button>`) +
+    `<input class="scrub" type="range" min="0" max="1" step="1" value="0" aria-label="Timeline">` +
+    `<span class="time">0.00s</span>`;
+  host.appendChild(el);
+
+  const playBtn = el.querySelector('[data-act="play"]');
+  const loopBtn = el.querySelector('[data-act="loop"]');
+  const scrub   = el.querySelector('.scrub');
+  const time    = el.querySelector('.time');
+
+  let queued = false;
+  const api = {
+    el, scrub,
+    /* enterFrame fires 60x/s per animation; coalesce into one paint. */
+    sync(){
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => { queued = false; api.draw(); });
+    },
+    draw(){
+      const a = get(); if (!a) return;
+      const total = a.totalFrames;
+      const f = Math.min(a.currentFrame, total);
+      scrub.max = Math.max(1, Math.round(total));
+      if (document.activeElement !== scrub || a.isPaused === false) scrub.value = f;
+      scrub.style.setProperty('--pct', (f / total * 100) + '%');
+      time.textContent = fmt(f / a.frameRate) + ' / ' + fmt(total / a.frameRate);
+      playBtn.innerHTML = svg(a.isPaused ? ICON.play : ICON.pause);
+      playBtn.setAttribute('aria-label', a.isPaused ? 'Play' : 'Pause');
+      if (loopBtn) loopBtn.setAttribute('aria-pressed', String(a.loop));
+    }
+  };
+
+  playBtn.onclick = () => {
+    const a = get();
+    if (!a.isPaused) a.pause();
+    else if (a.currentFrame >= a.totalFrames - 1) a.goToAndPlay(0, true);
+    else a.play();
+    api.draw();
+  };
+  el.querySelector('[data-act="stop"]').onclick = () => { get().goToAndStop(0, true); api.draw(); };
+  if (loopBtn) loopBtn.onclick = () => { opts.onLoop(!get().loop); api.draw(); };
+
+  scrub.addEventListener('input', () => {
+    const a = get();
+    a.goToAndStop(+scrub.value, true);
+    api.draw();
+  });
+  return api;
+}
+
+let cards = [];
+function build(anims){
+  closeSheet();
+  cards.forEach(c => c.anim.destroy());
+  document.getElementById('grid').replaceChildren();
+  cards = anims.map(def => {
+  const total = def.data.op - def.data.ip;
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML =
+    `<div class="card-head">
+       <span class="card-title"></span>
+       <span class="pill">${fmt(total / def.data.fr)}</span>
+     </div>
+     <div class="stage">
+       <div class="mount"></div>
+       <button class="expand" aria-label="Open large">
+         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+       </button>
+     </div>`;
+  card.querySelector('.card-title').textContent = def.name;
+  document.getElementById('grid').appendChild(card);
+
+  const mount = card.querySelector('.mount');
+  const c = { def, loop: state.loopAll, anim: null, ui: null };
+
+  c.ui = transport(card, () => c.anim, {
+    onLoop(v){ c.loop = v; c.anim.loop = v; if (v && c.anim.isPaused) c.anim.play(); }
+  });
+
+  c.load = () => {
+    const wasPaused = c.anim && c.anim.isPaused;
+    if (c.anim) c.anim.destroy();
+    c.anim = lottie.loadAnimation({
+      container: mount, renderer: 'svg', loop: c.loop, autoplay: !wasPaused,
+      animationData: withImage(def),
+      rendererSettings: { preserveAspectRatio: 'xMidYMid meet', progressiveLoad: false }
+    });
+    c.anim.addEventListener('enterFrame', c.ui.sync);
+    c.anim.addEventListener('complete', c.ui.sync);
+    c.anim.addEventListener('DOMLoaded', c.ui.sync);
+  };
+  c.load();
+
+  const open = () => openSheet(c);
+  card.querySelector('.stage').onclick = e => { if (!e.target.closest('.transport')) open(); };
+  return c;
+  });
+  document.getElementById('sub').textContent = cards.length + ' animations';
+}
+
+const toc = document.getElementById('versions');
+DATA.versions.forEach((v, i) => {
+  const li = document.createElement('li');
+  const b = document.createElement('button');
+  b.className = 'toc-item';
+  b.innerHTML = '<b></b><small></small>';
+  b.querySelector('b').textContent = v.label;
+  b.querySelector('small').textContent = v.anims.length + ' animations';
+  b.onclick = () => select(b, v);
+  li.appendChild(b);
+  toc.appendChild(li);
+});
+
+function select(b, v){
+  toc.querySelectorAll('.toc-item').forEach(x => x.setAttribute('aria-current', String(x === b)));
+  document.getElementById('verTitle').textContent = v.label;
+  document.getElementById('verDl').replaceChildren(...(v.downloads || []).map(d => {
+    const a = document.createElement('a');
+    a.className = 'btn'; a.href = d.href; a.download = ''; a.textContent = '↓ ' + d.label;
+    return a;
+  }));
+  build(v.anims);
+}
+
+/* ---------------- large view ---------------- */
+
+let sheet = null;
+
+function openSheet(c){
+  closeSheet();
+  const total = c.def.data.op - c.def.data.ip;
+  const o = document.createElement('div');
+  o.className = 'overlay';
+  o.innerHTML =
+    `<div class="sheet" role="dialog" aria-modal="true">
+       <div class="sheet-head">
+         <h3></h3>
+         <span class="pill">${c.def.data.w}×${c.def.data.h} · ${Math.round(total)}f @ ${c.def.data.fr}fps · ${fmt(total / c.def.data.fr)}</span>
+         <button class="btn icon" data-close aria-label="Close">
+           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+         </button>
+       </div>
+       <div class="stage"><div class="mount"></div></div>
+     </div>`;
+  o.querySelector('h3').textContent = c.def.name;
+  document.body.appendChild(o);
+
+  const anim = lottie.loadAnimation({
+    container: o.querySelector('.mount'), renderer: 'svg', loop: c.loop, autoplay: true,
+    animationData: withImage(c.def),
+    rendererSettings: { preserveAspectRatio: 'xMidYMid meet' }
+  });
+  const ui = transport(o.querySelector('.sheet'), () => anim, {
+    onLoop(v){ c.loop = v; anim.loop = v; c.anim.loop = v; c.ui.sync();
+               if (v && anim.isPaused) anim.play(); }
+  });
+  anim.addEventListener('enterFrame', ui.sync);
+  anim.addEventListener('complete', ui.sync);
+  anim.addEventListener('DOMLoaded', ui.sync);
+
+  o.onclick = e => { if (e.target === o || e.target.closest('[data-close]')) closeSheet(); };
+  sheet = { o, anim, ui, card: c };
+}
+
+function closeSheet(){
+  if (!sheet) return;
+  sheet.anim.destroy();
+  sheet.o.remove();
+  sheet = null;
+}
+
+addEventListener('keydown', e => {
+  if (!sheet) return;
+  const a = sheet.anim;
+  if (e.key === 'Escape') closeSheet();
+  else if (e.key === ' ') { e.preventDefault(); a.isPaused ? a.play() : a.pause(); sheet.ui.sync(); }
+  else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    a.goToAndStop(Math.max(0, Math.min(a.totalFrames, a.currentFrame + (e.key === 'ArrowRight' ? 1 : -1))), true);
+    sheet.ui.sync();
+  }
+});
+
+/* ---------------- global controls ---------------- */
+
+const reloadAll = () => {
+  const reopen = sheet && sheet.card;
+  closeSheet();
+  cards.forEach(c => c.load());
+  if (reopen) openSheet(reopen);
+};
+
+document.getElementById('playAll').onclick  = () => cards.forEach(c => { c.anim.play();  c.ui.sync(); });
+document.getElementById('pauseAll').onclick = () => cards.forEach(c => { c.anim.pause(); c.ui.sync(); });
+
+const loopAllBtn = document.getElementById('loopAll');
+loopAllBtn.onclick = () => {
+  state.loopAll = !state.loopAll;
+  loopAllBtn.setAttribute('aria-pressed', String(state.loopAll));
+  cards.forEach(c => {
+    c.loop = state.loopAll; c.anim.loop = state.loopAll;
+    if (state.loopAll && c.anim.isPaused) c.anim.play();
+    c.ui.sync();
+  });
+};
+
+const thumb = document.getElementById('thumb');
+const applyBtn = document.getElementById('apply');
+const hint = document.getElementById('imgHint');
+const HINT = 'pick a sample card, or drop an image anywhere';
+
+/* Selecting a card only previews it in the panel; Apply re-renders the animations. */
+function preview(src, name){
+  const img = new Image();
+  img.onload = () => {
+    state.pending = img;
+    thumb.src = img.src;
+    document.getElementById('imgName').textContent = name;
+    document.getElementById('imgDim').textContent = img.naturalWidth + '×' + img.naturalHeight;
+    hint.textContent = 'not applied yet';
+    applyBtn.disabled = false;
+  };
+  img.src = src;
+}
+
+applyBtn.onclick = () => {
+  state.img = state.pending; state.pending = null;
+  hint.textContent = HINT;
+  applyBtn.disabled = true;
+  reloadAll();
+};
+
+const sampleBtn = document.getElementById('sampleBtn');
+const sampleMenu = document.getElementById('sampleMenu');
+const toggleMenu = open => {
+  sampleMenu.hidden = !open;
+  sampleBtn.setAttribute('aria-expanded', String(open));
+  if (open) (sampleMenu.querySelector('[aria-selected="true"]') || sampleMenu.querySelector('button')).focus();
+};
+const markSample = p => sampleMenu.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.src === p)));
+
+for (const p of DATA.samples) {
+  const name = p.split('/').pop().replace(/\.png$/, '');
+  const li = document.createElement('li');
+  const b = document.createElement('button');
+  b.setAttribute('role', 'option'); b.dataset.src = p;
+  b.innerHTML = '<img loading="lazy" alt=""><span></span>';
+  b.querySelector('img').src = p;
+  b.querySelector('span').textContent = name;
+  b.onclick = () => { markSample(p); toggleMenu(false); sampleBtn.focus(); preview(p, name); };
+  li.appendChild(b); sampleMenu.appendChild(li);
+}
+sampleBtn.onclick = () => toggleMenu(sampleMenu.hidden);
+addEventListener('click', e => { if (!sampleMenu.hidden && !e.target.closest('.dd')) toggleMenu(false); });
+sampleMenu.addEventListener('keydown', e => {
+  const items = [...sampleMenu.querySelectorAll('button')], i = items.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); items[(i + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length].focus(); }
+  else if (e.key === 'Escape') { e.stopPropagation(); toggleMenu(false); sampleBtn.focus(); }
+});
+
+document.getElementById('reset').onclick = () => {
+  state.img = state.pending = null; markSample(null);
+  hint.textContent = HINT; applyBtn.disabled = true;
+  document.getElementById('imgName').textContent = 'Placeholder card';
+  document.getElementById('imgDim').textContent = 'generated';
+  thumb.src = placeholderCard(184, 120);
+  reloadAll();
+};
+thumb.src = placeholderCard(184, 120);
+select(toc.querySelector('.toc-item'), DATA.versions[0]);
+
+/* drop an image anywhere on the page */
+addEventListener('dragover', e => e.preventDefault());
+addEventListener('drop', e => {
+  const f = [...e.dataTransfer.files].find(x => x.type.startsWith('image/'));
+  if (!f) return;
+  e.preventDefault();
+  markSample(null);
+  preview(URL.createObjectURL(f), f.name);
+});
+</script>
+</body>
+</html>
