@@ -104,6 +104,43 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* ---------- grid ---------- */
 .layout{max-width:1480px;margin:0 auto;padding:22px 20px 64px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:28px;align-items:start}
 
+/* ---------- release notes accordion (closed by default) ---------- */
+.notes{margin:0 0 16px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.notes summary{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;list-style:none;font-size:13px}
+.notes summary::-webkit-details-marker{display:none}
+.notes summary b{font-weight:640}
+.notes summary span{color:var(--ink-3);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.notes summary svg{margin-left:auto;flex:none;color:var(--ink-3);transition:transform .15s}
+.notes[open] summary svg{transform:rotate(180deg)}
+.notes-body{padding:0 16px 16px;border-top:1px solid var(--line-soft)}
+.notes-vs{display:flex;align-items:center;gap:6px;margin:12px 0;font-size:12px;color:var(--ink-3)}
+.notes-vs button{color:var(--accent-ink);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.notes ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.note{list-style:none;border:1px solid var(--line-soft);border-radius:10px;padding:10px 11px}
+.note-head{display:flex;align-items:center;gap:8px}
+.note-head button{font-size:13px;font-weight:620;text-align:left;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note-head button:hover{color:var(--accent-ink)}
+.note-was{margin:2px 0 0;font-size:11.5px;color:var(--ink-3)}
+.note-k{display:block;margin:8px 0 2px;font-size:10.5px;font-weight:620;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.note ol{margin:0;padding-left:16px;font-size:12.5px;color:var(--ink-2)}
+.note p{margin:0;font-size:12.5px;color:var(--ink)}
+.note p.empty{color:var(--ink-3);font-style:italic}
+.edit-row{display:flex;align-items:flex-start;gap:6px}
+.edit-row p{flex:1;min-width:0;white-space:pre-wrap}
+.edit-btn{flex:none;font-size:11.5px;font-weight:600;color:var(--accent-ink);padding:0 2px}
+.edit-box{display:flex;flex-direction:column;gap:6px;flex:1}
+.edit-box textarea{font:inherit;font-size:12.5px;width:100%;min-height:72px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;resize:vertical;background:var(--panel);color:var(--ink)}
+.edit-box div{display:flex;gap:6px;align-items:center}
+.edit-box .btn{padding:5px 10px}
+.edit-box small{color:#b42318;font-size:11.5px}
+.notes-foot{margin:12px 0 0;font-size:12px;color:var(--ink-3)}
+
+.badge{flex:none;font-size:10.5px;font-weight:650;letter-spacing:.02em;padding:2px 7px;border-radius:99px}
+.badge.new{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent-ink)}
+.badge.changed{background:#fff1d6;color:#8a5a00}
+.badge.same{background:var(--stage);color:var(--ink-3)}
+.toc-item small i{font-style:normal;color:var(--accent-ink);font-weight:600}
+
 /* ---------- versions TOC ---------- */
 .toc{position:sticky;top:84px}
 .toc-label{font-size:11px;font-weight:620;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:6px 0 10px 12px}
@@ -217,6 +254,22 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .sheet .tbtn{width:34px;height:34px}
 .sheet .tbtn svg{width:18px;height:18px}
 .sheet .time{font-size:12px}
+.sheet{width:min(1280px,100%)}
+.sheet-body{display:grid;grid-template-columns:minmax(0,1fr) 300px;border-top:1px solid var(--line-soft)}
+.sheet-body .stage{border-top:0}
+.vars{border-left:1px solid var(--line-soft);padding:14px 16px;overflow:auto;max-height:min(70vh,640px)}
+.vars-k{display:block;margin:0 0 8px;font-size:10.5px;font-weight:620;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.vars-list{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:4px}
+.var{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--line-soft);text-align:left}
+.var:hover{border-color:var(--ink-3)}
+.var[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.var b{font-size:13px;font-weight:620}
+.var small{flex:1;min-width:0;font-size:11.5px;color:var(--ink-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vars .note{padding:0;border:0}
+@media (max-width:860px){
+  .sheet-body{grid-template-columns:1fr}
+  .vars{border-left:0;border-top:1px solid var(--line-soft);max-height:none}
+}
 
 .hint{margin:18px 0 0;font-size:12px;color:var(--ink-3);text-align:center}
 .hint kbd{font:inherit;font-size:11px;padding:1px 5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;background:var(--panel)}
@@ -273,6 +326,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <button id="playAll">Play all</button>
     <button id="pauseAll">Pause all</button>
   </div>
+  <details class="notes" id="notes"></details>
   <div class="grid" id="grid"></div>
   <p class="hint">In the large view: <kbd>space</kbd> play / pause · <kbd>←</kbd> <kbd>→</kbd> step a frame · <kbd>esc</kbd> close</p>
 </main>
@@ -322,12 +376,16 @@ function placeholderGlare(w, h){
 }
 
 const state = { img: null, loopAll: true };
-const cache = new Map();                       // "id@wxh" -> dataURI
+const cache = new Map();                       // "src|id@wxh" -> dataURI
 
+/* Only the `card` asset takes the picked image; other missing assets (the old
+   glare.png) keep their placeholder. The key includes the image src, so a
+   newly applied card never reuses an earlier card's crop. */
 function assetURI(a){
-  const key = (state.img ? 'u' : 'p') + a.id + a.w + 'x' + a.h;
+  const img = a.id === 'card' ? state.img : null;
+  const key = (img ? img.src : 'placeholder') + '|' + a.id + '@' + a.w + 'x' + a.h;
   if (!cache.has(key))
-    cache.set(key, state.img ? cover(state.img, a.w, a.h)
+    cache.set(key, img ? cover(img, a.w, a.h)
             : a.id === 'glare' ? placeholderGlare(a.w, a.h)
             : placeholderCard(a.w, a.h));
   return cache.get(key);
@@ -435,6 +493,12 @@ function build(anims){
        </button>
      </div>`;
   card.querySelector('.card-title').textContent = def.name;
+  if (def.status === 'new' || def.status === 'changed') {
+    const b = document.createElement('span');
+    b.className = 'badge ' + def.status;
+    b.textContent = def.status === 'new' ? 'New' : 'Updated';
+    card.querySelector('.card-title').after(b);
+  }
   document.getElementById('grid').appendChild(card);
 
   const mount = card.querySelector('.mount');
@@ -472,14 +536,119 @@ DATA.versions.forEach((v, i) => {
   b.className = 'toc-item';
   b.innerHTML = '<b></b><small></small>';
   b.querySelector('b').textContent = v.label;
-  b.querySelector('small').textContent = v.anims.length + ' animations';
-  b.onclick = () => select(b, v);
+  const small = b.querySelector('small');
+  small.textContent = v.anims.length + ' animations';
+  const n = v.anims.filter(a => a.status === 'new').length, u = v.anims.filter(a => a.status === 'changed').length;
+  if (n || u) small.insertAdjacentHTML('beforeend', ' · <i>' + [n && '+' + n + ' new', u && u + ' updated'].filter(Boolean).join(', ') + '</i>');
+  b.onclick = () => select(i);
   li.appendChild(b);
   toc.appendChild(li);
 });
 
-function select(b, v){
-  toc.querySelectorAll('.toc-item').forEach(x => x.setAttribute('aria-current', String(x === b)));
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+/* Which version each animation belongs to, and its variations across versions (matched by build.py's key). */
+const VER = new Map();
+DATA.versions.forEach(v => v.anims.forEach(a => VER.set(a, v)));
+const variations = def => DATA.versions.flatMap(v => v.anims.filter(a => a.key === def.key));
+
+/* "What changed / why" for one animation vs its predecessor in the next-older version. */
+function changeNote(def){
+  const v = VER.get(def), li = el('li', 'note');
+  if (def.was && def.was !== def.name) li.appendChild(el('p', 'note-was', 'Was “' + def.was + '” in ' + v.vs));
+  if (!def.status) { li.appendChild(el('p', 'empty', 'Oldest variation kept here, so there is nothing to compare it with.')); return li; }
+  if (def.status === 'same') { li.appendChild(el('p', 'empty', 'Identical to ' + v.vs + '.')); return li; }
+  li.appendChild(el('span', 'note-k', 'What changed vs ' + v.vs));
+  const ol = el('ol');
+  def.what.forEach(w => ol.appendChild(el('li', null, w)));
+  li.appendChild(ol);
+  li.appendChild(el('span', 'note-k', 'Why'));
+  li.appendChild(editable(() => def.why, 'No reason recorded yet.',
+    why => saveNote({ version: v.label, name: def.name, why }).then(() => { def.why = why.trim(); })));
+  return li;
+}
+
+/* Editing only works through serve.py (local). Any static host (Vercel, Pages) 404s /__edit, so viewers never see edit controls. */
+let EDIT = false;
+async function saveNote(body){
+  const r = await fetch('__notes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+}
+
+/* Text with an Edit button (in edit mode) that swaps to a textarea; save(text) returns a promise. */
+function editable(get, emptyText, save){
+  const row = el('div', 'edit-row');
+  const view = () => {
+    const t = get();
+    row.replaceChildren(t ? el('p', null, t) : el('p', 'empty', emptyText));
+    if (!EDIT) return;
+    const b = el('button', 'edit-btn', t ? 'Edit' : 'Add');
+    b.onclick = edit;
+    row.appendChild(b);
+  };
+  const edit = () => {
+    const box = el('div', 'edit-box'), ta = el('textarea'), bar = el('div');
+    const ok = el('button', 'btn primary', 'Save'), cancel = el('button', 'btn', 'Cancel'), err = el('small');
+    ta.value = get() || '';
+    bar.append(ok, cancel, err);
+    box.append(ta, bar);
+    row.replaceChildren(box);
+    ta.focus();
+    cancel.onclick = view;
+    ok.onclick = async () => {
+      ok.disabled = true; err.textContent = '';
+      try { await save(ta.value); view(); }
+      catch (e) { err.textContent = 'Not saved: ' + e.message; ok.disabled = false; }
+    };
+    ta.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); view(); } };
+  };
+  view();
+  return row;
+}
+const badge = s => el('span', 'badge ' + s, s === 'new' ? 'New' : s === 'changed' ? 'Updated' : 'Unchanged');
+
+/* Collapsed accordion above the grid: this version's changes. */
+function renderNotes(i){
+  const v = DATA.versions[i], box = document.getElementById('notes');
+  const changed = v.anims.filter(a => a.status === 'new' || a.status === 'changed');
+  const sum = el('summary');
+  sum.append(el('b', null, 'What changed in ' + v.label),
+    el('span', null, v.vs ? (changed.length ? changed.length + ' of ' + v.anims.length + ' animations' : 'nothing') + ' vs ' + v.vs + (v.summary ? ' · ' + v.summary : '')
+                          : 'Oldest version kept here'));
+  sum.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>');
+  const body = el('div', 'notes-body');
+  body.append(el('span', 'note-k', 'Summary'), editable(() => v.summary, 'No summary yet.',
+    summary => saveNote({ version: v.label, summary }).then(() => { v.summary = summary.trim(); renderNotes(i); box.open = true; })));
+  const wasOpen = box.open && box.dataset.v === v.label;
+  box.replaceChildren(sum, body);
+  box.dataset.v = v.label;
+  box.open = wasOpen;
+  if (!v.vs) return;
+
+  const vs = el('div', 'notes-vs', 'Compared with'), back = el('button', null, v.vs + ' →');
+  back.onclick = () => select(i + 1);
+  vs.appendChild(back);
+  const ul = el('ul');
+  for (const a of changed) {
+    const li = changeNote(a), head = el('div', 'note-head'), open = el('button', null, a.name);
+    open.title = 'Open large';
+    open.onclick = () => openSheet(cards.find(x => x.def === a));
+    head.append(open, badge(a.status));
+    li.prepend(head);
+    ul.appendChild(li);
+  }
+  body.append(vs, ul);
+  const same = v.anims.length - changed.length;
+  const foot = [same && same + ' unchanged from ' + v.vs, v.removed.length && 'Removed: ' + v.removed.join(', ')].filter(Boolean);
+  if (foot.length) body.appendChild(el('p', 'notes-foot', foot.join(' · ')));
+}
+
+let cur = 0;
+function select(i){
+  cur = i;
+  const v = DATA.versions[i], items = [...toc.querySelectorAll('.toc-item')];
+  items.forEach((x, j) => x.setAttribute('aria-current', String(j === i)));
+  renderNotes(i);
   document.getElementById('verTitle').textContent = v.label;
   document.getElementById('verDl').replaceChildren(...(v.downloads || []).map(d => {
     const a = document.createElement('a');
@@ -493,40 +662,60 @@ function select(b, v){
 
 let sheet = null;
 
+/* Large view. The right panel lists this animation's variations across
+   versions; picking one swaps the preview in place and shows its notes. */
 function openSheet(c){
   closeSheet();
-  const total = c.def.data.op - c.def.data.ip;
   const o = document.createElement('div');
   o.className = 'overlay';
   o.innerHTML =
     `<div class="sheet" role="dialog" aria-modal="true">
        <div class="sheet-head">
          <h3></h3>
-         <span class="pill">${c.def.data.w}×${c.def.data.h} · ${Math.round(total)}f @ ${c.def.data.fr}fps · ${fmt(total / c.def.data.fr)}</span>
+         <span class="pill"></span>
          <button class="btn icon" data-close aria-label="Close">
            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
          </button>
        </div>
-       <div class="stage"><div class="mount"></div></div>
+       <div class="sheet-body">
+         <div class="sheet-main"><div class="stage"><div class="mount"></div></div></div>
+         <aside class="vars" aria-label="Variations"><span class="vars-k">Variations</span><ul class="vars-list"></ul><div class="vars-note"></div></aside>
+       </div>
      </div>`;
-  o.querySelector('h3').textContent = c.def.name;
   document.body.appendChild(o);
+  sheet = { o, anim: null, ui: null, card: c };
 
-  const anim = lottie.loadAnimation({
-    container: o.querySelector('.mount'), renderer: 'svg', loop: c.loop, autoplay: true,
-    animationData: withImage(c.def),
-    rendererSettings: { preserveAspectRatio: 'xMidYMid meet' }
-  });
-  const ui = transport(o.querySelector('.sheet'), () => anim, {
-    onLoop(v){ c.loop = v; anim.loop = v; c.anim.loop = v; c.ui.sync();
-               if (v && anim.isPaused) anim.play(); }
-  });
-  anim.addEventListener('enterFrame', ui.sync);
-  anim.addEventListener('complete', ui.sync);
-  anim.addEventListener('DOMLoaded', ui.sync);
+  const list = o.querySelector('.vars-list');
+  const show = def => {
+    if (sheet.anim) sheet.anim.destroy();
+    const d = def.data, total = d.op - d.ip;
+    o.querySelector('h3').textContent = def.name + ' · ' + VER.get(def).label;
+    o.querySelector('.pill').textContent = `${d.w}×${d.h} · ${Math.round(total)}f @ ${d.fr}fps · ${fmt(total / d.fr)}`;
+    list.querySelectorAll('.var').forEach(b => b.setAttribute('aria-pressed', String(b.def === def)));
+    o.querySelector('.vars-note').replaceChildren(el('span', 'vars-k', 'Notes'), changeNote(def));
+    sheet.anim = lottie.loadAnimation({
+      container: o.querySelector('.mount'), renderer: 'svg', loop: c.loop, autoplay: true,
+      animationData: withImage(def),
+      rendererSettings: { preserveAspectRatio: 'xMidYMid meet' }
+    });
+    for (const ev of ['enterFrame', 'complete', 'DOMLoaded']) sheet.anim.addEventListener(ev, sheet.ui.sync);
+  };
 
+  for (const def of variations(c.def)) {
+    const b = el('button', 'var');
+    b.def = def;
+    b.append(el('b', null, VER.get(def).label), el('small', null, def.name === c.def.name ? '' : def.name));
+    if (def.status) b.appendChild(badge(def.status));
+    b.onclick = () => show(def);
+    const li = el('li'); li.appendChild(b); list.appendChild(li);
+  }
+
+  sheet.ui = transport(o.querySelector('.sheet-main'), () => sheet.anim, {
+    onLoop(v){ c.loop = v; sheet.anim.loop = v; c.anim.loop = v; c.ui.sync();
+               if (v && sheet.anim.isPaused) sheet.anim.play(); }
+  });
+  show(c.def);
   o.onclick = e => { if (e.target === o || e.target.closest('[data-close]')) closeSheet(); };
-  sheet = { o, anim, ui, card: c };
 }
 
 function closeSheet(){
@@ -537,7 +726,7 @@ function closeSheet(){
 }
 
 addEventListener('keydown', e => {
-  if (!sheet) return;
+  if (!sheet || e.target.closest('textarea')) return;
   const a = sheet.anim;
   if (e.key === 'Escape') closeSheet();
   else if (e.key === ' ') { e.preventDefault(); a.isPaused ? a.play() : a.pause(); sheet.ui.sync(); }
@@ -634,7 +823,8 @@ document.getElementById('reset').onclick = () => {
   reloadAll();
 };
 thumb.src = placeholderCard(184, 120);
-select(toc.querySelector('.toc-item'), DATA.versions[0]);
+select(0);
+fetch('__edit').then(r => { if (r.status === 204) { EDIT = true; renderNotes(cur); } }).catch(() => {});
 
 /* drop an image anywhere on the page */
 addEventListener('dragover', e => e.preventDefault());

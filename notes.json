@@ -1,0 +1,12 @@
+{
+  "v1.1": {
+    "summary": "Adds the Obscure retake animation.",
+    "why": {
+      "Obscure": "New retake reason: part of the card is covered by a thumb or finger. The animation shows the covered card being rejected, then the hand moving away and the card being accepted."
+    }
+  },
+  "v1.0": {
+    "summary": "First reworked set, replacing the Previous animations.",
+    "why": {}
+  }
+}
