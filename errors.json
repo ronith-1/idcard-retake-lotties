@@ -1,0 +1,12 @@
+{
+  "_note": "Drawer title per animation in the Preview tab, taken from the Figma 'Action sheet' frames (newest design wins).",
+  "_default": { "title": "Capture original ID" },
+  "Black White": { "title": "Black and white ID" },
+  "Blur": { "title": "Captured photo is blurry" },
+  "CapturedFromScreen": { "title": "ID Captured from phone" },
+  "Forgery": { "title": "Not Original ID" },
+  "Glare": { "title": "Glare on ID Card" },
+  "IncorrectId": { "title": "Incorrect Document" },
+  "Obscure": { "title": "Fingers are covering the card" },
+  "PartialID": { "title": "ID visible only partially" }
+}

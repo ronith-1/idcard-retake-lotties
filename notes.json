@@ -1,12 +1,34 @@
 {
-  "v1.1": {
-    "summary": "Adds the Obscure retake animation.",
-    "why": {
-      "Obscure": "New retake reason: part of the card is covered by a thumb or finger. The animation shows the covered card being rejected, then the hand moving away and the card being accepted."
-    }
+  "Black White": {
+    "v1": "From the pre-v1.0 set, named “IDCard - B&W”.",
+    "v2": "Reworked in the v1.0 set, replacing the pre-v1.0 animation."
   },
-  "v1.0": {
-    "summary": "First reworked set, replacing the Previous animations.",
-    "why": {}
+  "Blur": {
+    "v1": "From the pre-v1.0 set, named “IDCard - Blur”.",
+    "v2": "Reworked in the v1.0 set, replacing the pre-v1.0 animation."
+  },
+  "CapturedFromScreen": {
+    "v1": "From the pre-v1.0 set, named “IDCard - CapturedFromScreen”.",
+    "v2": "Reworked in the v1.0 set, replacing the pre-v1.0 animation."
+  },
+  "Forgery": {
+    "v1": "From the pre-v1.0 set, named “IDCard - Forgery”.",
+    "v2": "From the pre-v1.0 set, named “IDCard - Forgery v2”.",
+    "v3": "Reworked in the v1.0 set, replacing the pre-v1.0 animation."
+  },
+  "Glare": {
+    "v1": "From the pre-v1.0 set, named “IDCard - Glare”.",
+    "v2": "Reworked in the v1.0 set, replacing the pre-v1.0 animation."
+  },
+  "IncorrectId": {
+    "v1": "From the pre-v1.0 set, named “IDCard - IncorrectId”.",
+    "v2": "Reworked in the v1.0 set, replacing the pre-v1.0 animation."
+  },
+  "Obscure": {
+    "v1": "New retake reason: part of the card is covered by a thumb or finger. The animation shows the covered card being rejected, then the hand moving away and the card being accepted."
+  },
+  "PartialID": {
+    "v1": "From the pre-v1.0 set, named “IDCard - PartialID”.",
+    "v2": "Reworked in the v1.0 set, replacing the pre-v1.0 animation."
   }
 }

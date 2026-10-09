@@ -1,0 +1,14 @@
+template.html
+build.py
+serve.py
+notes.json
+errors.json
+CLAUDE.md
+roadmap.md
+prompts/
+IDCARDS.zip
+*.png.zip
+.DS_Store
+.git
+.gitignore
+.vercelignore

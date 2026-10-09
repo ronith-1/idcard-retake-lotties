@@ -1,30 +1,11 @@
-import glob, json, os, re
+import glob, json, os, re, zipfile
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "index.html")
-JSON_DIR, LOTTIE_DIR = "IDCardRetake Animations - JSON", "IDCardRetake Animations - dotLotiee"
+ANIMS = "animations"          # animations/<Name>/v1.json, v2.json, ... (+ optional vN.lottie)
 
-def clean(path):
-    return re.sub(r"\s+", " ", os.path.splitext(os.path.basename(path))[0]).strip()
-
-def release(label, folder):
-    base = "IDCARDS/Animations/" + folder + "/"
-    files = sorted(glob.glob(os.path.join(ROOT, base, JSON_DIR, "*.json")))
-    return {"label": label, "anims": [{"name": clean(f), "data": json.load(open(f))} for f in files],
-            "downloads": [{"label": "JSON (.zip)", "href": base + JSON_DIR + ".zip"},
-                          {"label": "dotLottie (.zip)", "href": base + LOTTIE_DIR + ".zip"}]}
-
-# newest first; "Previous" is the pre-v1.0 set extracted from the old index.html
-versions = [
-    release("v1.1", "V1.1"),
-    release("v1.0", "V1"),
-    {"label": "Previous", "anims": json.load(open(os.path.join(ROOT, "previous.json")))},
-]
-
-def key(name):
-    """Match an animation across versions: 'IDCard - B&W' == 'Black White', 'Forgery v2' == 'Forgery'."""
-    k = re.sub(r"^IDCard\s*-\s*", "", name).replace("B&W", "Black White")
-    return re.sub(r"\s+v\d+$", "", k).lower()
+rel = lambda p: os.path.relpath(p, ROOT)
+vnum = lambda p: int(re.search(r"v(\d+)\.json$", p)[1])
 
 def what(a, b):
     """Plain-language list of what changed from animation a (old) to b (new)."""
@@ -46,31 +27,40 @@ def what(a, b):
     return out
 
 notes = json.load(open(os.path.join(ROOT, "notes.json")))
-for v, older in zip(versions, versions[1:] + [None]):
-    n = notes.get(v["label"], {})
-    v["summary"] = n.get("summary", "")
-    for x in v["anims"]:
-        x["key"] = key(x["name"])
-    if older is None:
-        continue
-    v["vs"] = older["label"]
-    prev = {key(x["name"]): x for x in older["anims"]}   # later duplicates win ("Forgery v2" over "Forgery")
-    for x in v["anims"]:
-        p = prev.pop(x["key"], None)
-        x["status"] = "new" if p is None else "same" if p["data"] == x["data"] else "changed"
-        if x["status"] != "same":
-            x.update(was=p and p["name"], what=["New animation"] if p is None else what(p["data"], x["data"]),
-                     why=n.get("why", {}).get(x["name"], ""))
-    v["removed"] = sorted(x["name"] for x in prev.values())
+anims = []
+for d in sorted(glob.glob(os.path.join(ROOT, ANIMS, "*", ""))):
+    name, prev, versions = os.path.basename(d.rstrip("/")), None, []
+    for f in sorted(glob.glob(os.path.join(d, "v*.json")), key=vnum):
+        v, data = f"v{vnum(f)}", json.load(open(f))
+        lottie = f[:-5] + ".lottie"
+        versions.append({"v": v, "data": data, "json": rel(f), "lottie": rel(lottie) if os.path.exists(lottie) else None,
+                         "note": notes.get(name, {}).get(v, ""), "what": prev and what(prev, data)})
+        prev = data
+    if versions:
+        anims.append({"name": name, "versions": versions[::-1]})   # newest first
 
+# "Download all" = the latest version of every animation. Fixed timestamps keep the zips byte-stable between builds.
+def bundle(path, files):
+    with zipfile.ZipFile(os.path.join(ROOT, path), "w", zipfile.ZIP_DEFLATED) as z:
+        for arc, src in files:
+            z.writestr(zipfile.ZipInfo(arc, (2020, 1, 1, 0, 0, 0)), open(os.path.join(ROOT, src), "rb").read(), zipfile.ZIP_DEFLATED)
+    return path
+latest = [(a["name"], a["versions"][0]) for a in anims]
+downloads = [
+    {"label": "Latest JSON (.zip)", "href": bundle(f"{ANIMS}/latest-json.zip", [(f"{n}.json", v["json"]) for n, v in latest])},
+    {"label": "Latest dotLottie (.zip)", "href": bundle(f"{ANIMS}/latest-dotlottie.zip", [(f"{n}.lottie", v["lottie"]) for n, v in latest if v["lottie"]])},
+]
+
+# Production default card: IDCARDS/default.png (or .jpg/.webp) replaces the generated placeholder when present.
+default = next((f"IDCARDS/default.{e}" for e in ("png", "jpg", "jpeg", "webp") if os.path.exists(os.path.join(ROOT, f"IDCARDS/default.{e}"))), None)
+errors_path = os.path.join(ROOT, "errors.json")   # mobile error-drawer copy
 data = {
-    "versions": versions,
-    "samples": sorted(os.path.relpath(f, ROOT) for f in glob.glob(os.path.join(ROOT, "IDCARDS", "*.png"))),
+    "anims": anims,
+    "errors": json.load(open(errors_path)) if os.path.exists(errors_path) else {},
+    "downloads": downloads,
+    "default": default,
+    "samples": sorted(rel(f) for f in glob.glob(os.path.join(ROOT, "IDCARDS", "*.png"))),
 }
 tpl = open(os.path.join(ROOT, "template.html")).read()
 open(OUT, "w").write(tpl.replace("/*__ANIMS__*/null", json.dumps(data, separators=(",", ":"))))
-print("wrote", OUT, os.path.getsize(OUT), "bytes;", ", ".join(f"{v['label']}: {len(v['anims'])}" for v in versions))
-for v in versions:
-    for x in v["anims"]:
-        if "what" in x:
-            print(f"  {v['label']} {x['status']:7} {x['name']}: {'; '.join(x['what'])}")
+print("wrote", OUT, os.path.getsize(OUT), "bytes;", ", ".join(f"{a['name']} {a['versions'][0]['v']}" for a in anims))

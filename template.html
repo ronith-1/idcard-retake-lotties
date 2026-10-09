@@ -6,6 +6,10 @@
 <title>IDCard Retake Lotties — Test Bench</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
 <style>
+/* Inter 3.19 (what Figma renders with); Google Fonts' Inter 4 glyphs miss the Figma screens by a visible margin. */
+@font-face{font-family:Inter3;font-weight:400;font-display:block;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@4.5.15/files/inter-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:Inter3;font-weight:500;font-display:block;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@4.5.15/files/inter-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:Inter3;font-weight:600;font-display:block;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@4.5.15/files/inter-latin-600-normal.woff2) format("woff2")}
 :root{
   --bg:#f4f5f7; --panel:#fff; --line:#e4e6ea; --line-soft:#eef0f3;
   --ink:#16181d; --ink-2:#5b6270; --ink-3:#8c93a1;
@@ -102,71 +106,28 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 }
 
 /* ---------- grid ---------- */
-.layout{max-width:1480px;margin:0 auto;padding:22px 20px 64px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:28px;align-items:start}
+.layout{max-width:1480px;margin:0 auto;padding:22px 20px 64px;display:grid;grid-template-columns:minmax(0,1fr);gap:28px;align-items:start}
 
-/* ---------- release notes accordion (closed by default) ---------- */
-.notes{margin:0 0 16px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
-.notes summary{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;list-style:none;font-size:13px}
-.notes summary::-webkit-details-marker{display:none}
-.notes summary b{font-weight:640}
-.notes summary span{color:var(--ink-3);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.notes summary svg{margin-left:auto;flex:none;color:var(--ink-3);transition:transform .15s}
-.notes[open] summary svg{transform:rotate(180deg)}
-.notes-body{padding:0 16px 16px;border-top:1px solid var(--line-soft)}
-.notes-vs{display:flex;align-items:center;gap:6px;margin:12px 0;font-size:12px;color:var(--ink-3)}
-.notes-vs button{color:var(--accent-ink);font-weight:600;text-decoration:underline;text-underline-offset:2px}
-.notes ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
-.note{list-style:none;border:1px solid var(--line-soft);border-radius:10px;padding:10px 11px}
-.note-head{display:flex;align-items:center;gap:8px}
-.note-head button{font-size:13px;font-weight:620;text-align:left;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.note-head button:hover{color:var(--accent-ink)}
-.note-was{margin:2px 0 0;font-size:11.5px;color:var(--ink-3)}
+/* ---------- changelog notes ---------- */
 .note-k{display:block;margin:8px 0 2px;font-size:10.5px;font-weight:620;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.note{list-style:none}
 .note ol{margin:0;padding-left:16px;font-size:12.5px;color:var(--ink-2)}
 .note p{margin:0;font-size:12.5px;color:var(--ink)}
 .note p.empty{color:var(--ink-3);font-style:italic}
-.edit-row{display:flex;align-items:flex-start;gap:6px}
-.edit-row p{flex:1;min-width:0;white-space:pre-wrap}
-.edit-btn{flex:none;font-size:11.5px;font-weight:600;color:var(--accent-ink);padding:0 2px}
-.edit-box{display:flex;flex-direction:column;gap:6px;flex:1}
-.edit-box textarea{font:inherit;font-size:12.5px;width:100%;min-height:72px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;resize:vertical;background:var(--panel);color:var(--ink)}
-.edit-box div{display:flex;gap:6px;align-items:center}
-.edit-box .btn{padding:5px 10px}
-.edit-box small{color:#b42318;font-size:11.5px}
-.notes-foot{margin:12px 0 0;font-size:12px;color:var(--ink-3)}
+.note-text{white-space:pre-wrap;margin:6px 0 0!important}
+.note-edit{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+.note-edit textarea{font:inherit;font-size:12.5px;line-height:1.45;width:100%;min-height:54px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;resize:vertical;background:var(--panel);color:var(--ink)}
+.note-edit textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+.note-edit small{font-size:11px;color:var(--ink-3);min-height:14px}
+.note-edit small.ok{color:var(--accent-ink)}
+.note-edit small.err{color:#b42318}
+.note ol.detected{color:var(--ink-3);font-size:12px}
+.var-dl{display:flex;gap:6px;margin-top:10px}
+.var-dl .btn{padding:5px 9px;font-size:12px;text-decoration:none}
 
 .badge{flex:none;font-size:10.5px;font-weight:650;letter-spacing:.02em;padding:2px 7px;border-radius:99px}
 .badge.new{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent-ink)}
-.badge.changed{background:#fff1d6;color:#8a5a00}
-.badge.same{background:var(--stage);color:var(--ink-3)}
-.toc-item small i{font-style:normal;color:var(--accent-ink);font-weight:600}
 
-/* ---------- versions TOC ---------- */
-.toc{position:sticky;top:84px}
-.toc-label{font-size:11px;font-weight:620;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:6px 0 10px 12px}
-.toc ol{list-style:none;margin:0;padding:0;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:2px}
-.toc li{margin-left:-1px}
-.toc-item{
-  display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;text-align:left;
-  padding:8px 12px;border-left:2px solid transparent;border-radius:0 9px 9px 0;
-  transition:background .14s,border-color .14s,color .14s;
-}
-.toc-item b{font-size:13px;font-weight:600;color:var(--ink-2)}
-.toc-item small{font-size:11.5px;color:var(--ink-3)}
-.toc-item:hover{background:color-mix(in srgb,var(--ink) 4%,transparent)}
-.toc-item:hover b{color:var(--ink)}
-.toc-item[aria-current="true"]{border-left-color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,transparent)}
-.toc-item[aria-current="true"] b{color:var(--ink)}
-
-@media (max-width:860px){
-  .layout{grid-template-columns:1fr;gap:16px}
-  .toc{position:static}
-  .toc-label{margin-left:0}
-  .toc ol{flex-direction:row;flex-wrap:wrap;border-left:0;gap:8px}
-  .toc li{margin-left:0}
-  .toc-item{border:1px solid var(--line);border-radius:10px;background:var(--panel)}
-  .toc-item[aria-current="true"]{border-color:var(--accent)}
-}
 .meta-row{display:flex;align-items:baseline;gap:10px;margin:0 0 16px;flex-wrap:wrap}
 .meta-row h2{margin:0;font-size:20px;font-weight:660;letter-spacing:-.02em}
 .meta-row span{font-size:12.5px;color:var(--ink-3)}
@@ -257,6 +218,20 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .sheet{width:min(1280px,100%)}
 .sheet-body{display:grid;grid-template-columns:minmax(0,1fr) 300px;border-top:1px solid var(--line-soft)}
 .sheet-body .stage{border-top:0}
+.sheet-head .seg button{padding:4px 10px}
+
+/* Full-window large view (button or "f"): the modal fills the browser window. */
+.overlay.full{padding:0}
+.overlay.full .sheet{width:100%;height:100%;max-height:none;border-radius:0;border:0;display:flex;flex-direction:column;animation:none}
+.overlay.full .sheet-body{flex:1;min-height:0}
+.overlay.full .sheet-main,.overlay.full .view{display:flex;flex-direction:column;min-height:0;flex:1}
+.overlay.full .view>.stage{flex:1;aspect-ratio:auto}
+.overlay.full .allgrid{flex:1;max-height:none;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));align-content:start}
+.overlay.full .vars{max-height:none}
+.allgrid{display:grid;grid-auto-rows:max-content;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;padding:12px;max-height:min(62vh,580px);overflow:auto;background:var(--stage)}
+.allgrid figure{margin:0;background:var(--panel);border:1px solid var(--line-soft);border-radius:10px;overflow:hidden}
+.allgrid .stage{cursor:default;border:0}
+.allgrid figcaption{padding:6px 9px;font-size:11.5px;font-weight:600;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .vars{border-left:1px solid var(--line-soft);padding:14px 16px;overflow:auto;max-height:min(70vh,640px)}
 .vars-k{display:block;margin:0 0 8px;font-size:10.5px;font-weight:620;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
 .vars-list{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:4px}
@@ -271,6 +246,77 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   .vars{border-left:0;border-top:1px solid var(--line-soft);max-height:none}
 }
 
+/* ---------- Preview tab: the Figma retake flow (processing → error → drawer) ----------
+   Everything inside .pv is 1:1 Figma px on a 375×812 frame; .pv-fit scales it to the window. */
+.pv-ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+.pv-ctl label{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:550;color:var(--ink-2)}
+.pv-ctl select{font:inherit;color:var(--ink);padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.pv-stage{display:flex;justify-content:center}
+.pv-fit{flex:none;width:calc(375px*var(--k,1));height:calc(812px*var(--k,1));box-shadow:0 4px 12px 2px rgba(0,0,0,.1)}
+.pv{position:relative;width:375px;height:812px;overflow:hidden;background:#fff;transform:scale(var(--k,1));transform-origin:0 0;
+  font-family:Inter3,sans-serif;line-height:normal;letter-spacing:0;color:#333}
+.pv img{display:block;max-width:none}
+.pv-screen{position:absolute;inset:0;background:#fff}
+.pv-status{position:absolute;left:0;top:0;width:375px;height:44px;overflow:hidden;background:#fff}
+.pv-notch{position:absolute;left:78px;top:-2px;width:219px;height:30px}
+.pv-time{position:absolute;left:21px;top:12px;width:54px;height:21px}
+.pv-right{position:absolute;left:0;top:0;transform:translate(293.67px,17.33px);width:66.6614px;height:11.336px}   /* translate keeps the sub-pixel offset; left/top snap */
+.pv-top{position:absolute;left:0;top:44px;width:375px;height:56px;padding:0 24px;background:#fff;display:flex;align-items:center}
+.pv-top>span{flex:1 0 0;display:flex}
+.pv-back{width:32px;height:32px;border-radius:100px;background:rgba(5,5,82,.03);display:flex;align-items:center;justify-content:center}
+.pv-back img{width:16px;height:16px}
+.pv-col{position:absolute;left:24px;top:160px;width:327px;display:flex;flex-direction:column;align-items:center;gap:24px}
+.pv-title{font-weight:600;font-size:20px;line-height:28px;text-align:center;white-space:nowrap}
+.pv-processing .pv-title{color:#616161}
+/* clip-path, not overflow:hidden: Chrome snaps an overflow clip to 203px and drops Figma's .136px edge row. */
+.pv-photo{position:relative;flex:none;width:327px;height:203.136px;border-radius:6px;clip-path:inset(0 round 6px);background:#616161}
+.pv-img,.pv-tint{position:absolute;left:0;top:0;width:327px;height:231px}
+.pv-img{object-fit:cover}
+.pv-processing .pv-img,.pv-processing .pv-tint{top:.07px}
+.pv-tint{background:rgba(5,5,82,.4)}
+.pv-error .pv-tint{background:rgba(200,53,50,.4)}
+/* Figma's INSIDE stroke paints above the photo, so it's an overlay, not a border. */
+.pv-error .pv-photo::after{content:'';position:absolute;inset:0;border-radius:6px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.pv-spin{position:absolute;left:152px;top:91px;width:22px;height:22px}
+.pv-spin img{position:absolute;left:0;top:0}
+html:not(.shot) .pv-spin{animation:pvspin .8s linear infinite}
+@keyframes pvspin{to{transform:rotate(1turn)}}
+.pv-badge{position:absolute;left:136px;top:79px;width:56px;height:56px}
+.pv-foot{position:absolute;left:0;top:738px;width:375px;height:40px;padding:12px 24px;background:#fff;display:flex;justify-content:center;align-items:center}
+.pv-by{display:flex;align-items:center;gap:4px;font-size:10px;line-height:12px;color:#050552;white-space:nowrap}
+.pv-by>span:last-child{width:115px}   /* Figma's text box; Chrome's advance is a hair narrower and would shift the centered row */
+.pv-shield{width:16px;height:16px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pv-shield img{width:10.6465px;height:12.8px}
+.pv-home{position:relative;height:24px;background:#fff}
+.pv-screen>.pv-home{position:absolute;left:0;top:778px;width:375px;height:34px}
+.pv-home i{position:absolute;left:121px;bottom:8px;width:134px;height:5px;border-radius:100px;background:#000}
+.pv-error{opacity:0}
+.pv[data-step="error"] .pv-error,.pv[data-step="drawer"] .pv-error{opacity:1}
+/* The scrim is the sheet container's own fill, so it slides up with the sheet (Figma smart animate). */
+.pv-sheetwrap{position:absolute;left:-4px;top:-7px;width:383px;height:822px;overflow:hidden;background:rgba(0,0,0,0);transform:translateY(822px)}
+.pv[data-step="drawer"] .pv-sheetwrap{transform:none;background:rgba(0,0,0,.4)}
+.pv.pv-anim .pv-error{transition:opacity .3s cubic-bezier(0,0,.58,1)}
+.pv.pv-anim .pv-sheetwrap{transition:transform .8s cubic-bezier(.3,-.05,.7,-.5),background-color .8s cubic-bezier(.3,-.05,.7,-.5)}
+.pv-sheet{position:absolute;left:4px;top:469px;width:375px;display:flex;flex-direction:column}
+.pv-sheet-body{border-radius:20px 20px 0 0;overflow:hidden;display:flex;flex-direction:column}
+.pv-head{height:56px;padding:16px 0;background:#fff;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:inset 0 -1px 0 rgba(5,5,82,.1)}
+.pv-head-t{position:relative;top:.5px;font-weight:600;font-size:18px;line-height:22px;white-space:nowrap}   /* Figma's "auto" line height sits the glyphs .5px lower */
+.pv-speak{position:relative;flex:none;width:28px;height:28px;border-radius:8px;background:#fff;box-shadow:0 0 0 1px rgba(5,5,82,.1)}
+.pv-speak img{position:absolute;left:4.5px;top:4px;width:20px;height:20px}
+.pv-media{padding:16px 24px;background:#fff;display:flex;flex-direction:column;align-items:center}
+.pv-lottie{position:relative;width:325px;height:166px;border-radius:12px;overflow:hidden;background:#f4f4f4;box-shadow:0 0 0 1px #e9e9e9}
+.pv-lottie svg{display:block}
+.pv-btns{padding:12px 20px;background:#fff;box-shadow:inset 0 1px 0 #e6e6e6}
+.pv-btn span{position:relative;top:.5px;left:-.5px}   /* matches Figma's 88×17 label box at 143.5,743.5 */
+.pv-btn{height:48px;padding:10px;border-radius:6px;background:#554ef1;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;line-height:17px}
+
+/* ?shot=processing|error|drawer: the bare 375×812 frame at 1:1, for pixel diffs against Figma. */
+html.shot body{background:#fff;overflow:hidden}
+html.shot .bar,html.shot .picker,html.shot .pv-ctl{display:none}
+html.shot .layout{padding:0;margin:0}
+html.shot .pv-stage{display:block}
+html.shot .pv-fit{--k:1;box-shadow:none}
+
 .hint{margin:18px 0 0;font-size:12px;color:var(--ink-3);text-align:center}
 .hint kbd{font:inherit;font-size:11px;padding:1px 5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;background:var(--panel)}
 </style>
@@ -284,17 +330,18 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <span id="sub">— animations</span>
     </div>
 
-    <div class="seg" role="group" aria-label="Loop">
+    <div class="seg" role="group" aria-label="View" id="tabs">
+      <button data-tab="anims" aria-pressed="true">Animations</button>
+      <button data-tab="preview" aria-pressed="false">Preview</button>
+    </div>
+
+    <div class="seg" role="group" aria-label="Loop" id="loopSeg">
       <button id="loopAll" aria-pressed="true">Loop all</button>
     </div>
   </div>
 </div>
 
 <div class="layout">
-<nav class="toc" aria-label="Versions">
-  <div class="toc-label">Versions</div>
-  <ol id="versions"></ol>
-</nav>
 <main>
   <section class="picker" aria-label="Card image">
     <img id="thumb" class="picker-thumb" alt="">
@@ -317,35 +364,57 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       </button>
     </div>
   </section>
+  <section id="tabAnims">
   <div class="meta-row">
-    <h2 id="verTitle">Preview grid</h2>
-    <span>Click a preview to open it large.</span>
+    <h2>Animations</h2>
+    <span>Latest version of each. Click one for its version history.</span>
     <div class="ver-dl" id="verDl"></div>
   </div>
   <div class="seg play-seg" role="group" aria-label="Playback">
     <button id="playAll">Play all</button>
     <button id="pauseAll">Pause all</button>
   </div>
-  <details class="notes" id="notes"></details>
   <div class="grid" id="grid"></div>
-  <p class="hint">In the large view: <kbd>space</kbd> play / pause · <kbd>←</kbd> <kbd>→</kbd> step a frame · <kbd>esc</kbd> close</p>
+  <p class="hint">In the large view: <kbd>space</kbd> play / pause · <kbd>←</kbd> <kbd>→</kbd> step a frame · <kbd>f</kbd> full screen · <kbd>esc</kbd> close</p>
+  </section>
+  <section id="tabPreview" hidden>
+    <div class="pv-ctl">
+      <label>Animation <select id="pvAnim"></select></label>
+      <label>Version <select id="pvVer"></select></label>
+      <button class="btn primary" id="pvPlay">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>Play
+      </button>
+      <div class="seg" role="group" aria-label="Jump to screen" id="pvJump">
+        <button data-step="processing">Processing</button>
+        <button data-step="error">Error</button>
+        <button data-step="drawer">Drawer</button>
+      </div>
+    </div>
+    <div class="pv-stage"><div class="pv-fit"><div class="pv" id="pv" data-step="processing"></div></div></div>
+  </section>
 </main>
 </div>
 
 <script>
-const DATA = /*__ANIMS__*/null;          // {versions:[{label, anims:[{name,data}], downloads?:[{label,href}]}], samples:[path]}
+const DATA = /*__ANIMS__*/null;          // {anims:[{name, versions:[{v,data,json,lottie,note,what}]}] (newest first), downloads, default, samples}
+for (const a of DATA.anims) for (const ver of a.versions) { ver.name = a.name; ver.anim = a; }
 
 /* ---------------- image plumbing ---------------- */
 
 /* Draw a source image into exactly w×h using cover-crop, so the uploaded
    picture keeps its aspect ratio inside the Lottie's fixed asset box. */
 function cover(img, w, h){
-  const c = document.createElement('canvas');
-  c.width = w; c.height = h;
-  const x = c.getContext('2d');
+  /* Rasterise at the source's own resolution (up to 4×), not at the asset's w×h.
+     lottie-web sizes the <image> from the asset's w/h, so the extra pixels only add
+     sharpness when the preview is scaled up (large view, full screen, retina). */
   const s = Math.max(w / img.naturalWidth, h / img.naturalHeight);
-  const dw = img.naturalWidth * s, dh = img.naturalHeight * s;
-  x.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+  const k = Math.min(4, Math.max(1, 1 / s));
+  const c = document.createElement('canvas');
+  c.width = Math.round(w * k); c.height = Math.round(h * k);
+  const x = c.getContext('2d');
+  x.imageSmoothingQuality = 'high';
+  const dw = img.naturalWidth * s * k, dh = img.naturalHeight * s * k;
+  x.drawImage(img, (c.width - dw) / 2, (c.height - dh) / 2, dw, dh);
   return c.toDataURL('image/png');
 }
 
@@ -381,22 +450,22 @@ const cache = new Map();                       // "src|id@wxh" -> dataURI
 /* Only the `card` asset takes the picked image; other missing assets (the old
    glare.png) keep their placeholder. The key includes the image src, so a
    newly applied card never reuses an earlier card's crop. */
-function assetURI(a){
-  const img = a.id === 'card' ? state.img : null;
+function assetURI(a, pick){
+  const img = a.id === 'card' ? pick : null;
   const key = (img ? img.src : 'placeholder') + '|' + a.id + '@' + a.w + 'x' + a.h;
   if (!cache.has(key))
     cache.set(key, img ? cover(img, a.w, a.h)
-            : a.id === 'glare' ? placeholderGlare(a.w, a.h)
-            : placeholderCard(a.w, a.h));
+            : a.id === 'glare' ? placeholderGlare(a.w * 3, a.h * 3)
+            : placeholderCard(a.w * 3, a.h * 3));   // 3× so it stays crisp when scaled up
   return cache.get(key);
 }
 
 /* Inline every image asset as a data URI so nothing is fetched at runtime. */
-function withImage(def){
+function withImage(def, img = state.img){
   const d = structuredClone(def.data);
   for (const a of d.assets || []) {
     if (a.p === undefined || a.id === undefined || !a.w || a.p.startsWith('data:')) continue;
-    a.p = assetURI(a); a.u = ''; a.e = 1;
+    a.p = assetURI(a, img); a.u = ''; a.e = 1;
   }
   return d;
 }
@@ -484,6 +553,7 @@ function build(anims){
   card.innerHTML =
     `<div class="card-head">
        <span class="card-title"></span>
+       <span class="pill" title="${def.anim.versions.length} version${def.anim.versions.length > 1 ? 's' : ''}">${def.v}</span>
        <span class="pill">${fmt(total / def.data.fr)}</span>
      </div>
      <div class="stage">
@@ -493,12 +563,6 @@ function build(anims){
        </button>
      </div>`;
   card.querySelector('.card-title').textContent = def.name;
-  if (def.status === 'new' || def.status === 'changed') {
-    const b = document.createElement('span');
-    b.className = 'badge ' + def.status;
-    b.textContent = def.status === 'new' ? 'New' : 'Updated';
-    card.querySelector('.card-title').after(b);
-  }
   document.getElementById('grid').appendChild(card);
 
   const mount = card.querySelector('.mount');
@@ -529,44 +593,7 @@ function build(anims){
   document.getElementById('sub').textContent = cards.length + ' animations';
 }
 
-const toc = document.getElementById('versions');
-DATA.versions.forEach((v, i) => {
-  const li = document.createElement('li');
-  const b = document.createElement('button');
-  b.className = 'toc-item';
-  b.innerHTML = '<b></b><small></small>';
-  b.querySelector('b').textContent = v.label;
-  const small = b.querySelector('small');
-  small.textContent = v.anims.length + ' animations';
-  const n = v.anims.filter(a => a.status === 'new').length, u = v.anims.filter(a => a.status === 'changed').length;
-  if (n || u) small.insertAdjacentHTML('beforeend', ' · <i>' + [n && '+' + n + ' new', u && u + ' updated'].filter(Boolean).join(', ') + '</i>');
-  b.onclick = () => select(i);
-  li.appendChild(b);
-  toc.appendChild(li);
-});
-
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-
-/* Which version each animation belongs to, and its variations across versions (matched by build.py's key). */
-const VER = new Map();
-DATA.versions.forEach(v => v.anims.forEach(a => VER.set(a, v)));
-const variations = def => DATA.versions.flatMap(v => v.anims.filter(a => a.key === def.key));
-
-/* "What changed / why" for one animation vs its predecessor in the next-older version. */
-function changeNote(def){
-  const v = VER.get(def), li = el('li', 'note');
-  if (def.was && def.was !== def.name) li.appendChild(el('p', 'note-was', 'Was “' + def.was + '” in ' + v.vs));
-  if (!def.status) { li.appendChild(el('p', 'empty', 'Oldest variation kept here, so there is nothing to compare it with.')); return li; }
-  if (def.status === 'same') { li.appendChild(el('p', 'empty', 'Identical to ' + v.vs + '.')); return li; }
-  li.appendChild(el('span', 'note-k', 'What changed vs ' + v.vs));
-  const ol = el('ol');
-  def.what.forEach(w => ol.appendChild(el('li', null, w)));
-  li.appendChild(ol);
-  li.appendChild(el('span', 'note-k', 'Why'));
-  li.appendChild(editable(() => def.why, 'No reason recorded yet.',
-    why => saveNote({ version: v.label, name: def.name, why }).then(() => { def.why = why.trim(); })));
-  return li;
-}
 
 /* Editing only works through serve.py (local). Any static host (Vercel, Pages) 404s /__edit, so viewers never see edit controls. */
 let EDIT = false;
@@ -575,92 +602,72 @@ async function saveNote(body){
   if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
 }
 
-/* Text with an Edit button (in edit mode) that swaps to a textarea; save(text) returns a promise. */
-function editable(get, emptyText, save){
-  const row = el('div', 'edit-row');
-  const view = () => {
-    const t = get();
-    row.replaceChildren(t ? el('p', null, t) : el('p', 'empty', emptyText));
-    if (!EDIT) return;
-    const b = el('button', 'edit-btn', t ? 'Edit' : 'Add');
-    b.onclick = edit;
-    row.appendChild(b);
+/* Free-text changelog field. Locally: an always-editable textarea that saves when it loses focus
+   (or ⌘/Ctrl+Enter). Hosted: plain text. save(text) returns a promise. */
+function noteField(get, save, placeholder){
+  if (!EDIT) { const t = get(); return t ? el('p', 'note-text', t) : el('p', 'note-text empty', placeholder); }
+  const box = el('div', 'note-edit'), ta = el('textarea'), status = el('small');
+  ta.value = get() || '';
+  ta.placeholder = placeholder;
+  const fit = () => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 2 + 'px'; };
+  ta.oninput = () => { status.textContent = 'Unsaved'; status.className = ''; fit(); };
+  ta.onchange = async () => {
+    status.textContent = 'Saving…';
+    try { await save(ta.value); status.textContent = 'Saved'; status.className = 'ok'; }
+    catch (e) { status.textContent = 'Not saved: ' + e.message; status.className = 'err'; }
   };
-  const edit = () => {
-    const box = el('div', 'edit-box'), ta = el('textarea'), bar = el('div');
-    const ok = el('button', 'btn primary', 'Save'), cancel = el('button', 'btn', 'Cancel'), err = el('small');
-    ta.value = get() || '';
-    bar.append(ok, cancel, err);
-    box.append(ta, bar);
-    row.replaceChildren(box);
-    ta.focus();
-    cancel.onclick = view;
-    ok.onclick = async () => {
-      ok.disabled = true; err.textContent = '';
-      try { await save(ta.value); view(); }
-      catch (e) { err.textContent = 'Not saved: ' + e.message; ok.disabled = false; }
-    };
-    ta.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); view(); } };
-  };
-  view();
-  return row;
+  ta.onkeydown = e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) ta.blur(); };
+  box.append(ta, status);
+  requestAnimationFrame(fit);
+  return box;
 }
-const badge = s => el('span', 'badge ' + s, s === 'new' ? 'New' : s === 'changed' ? 'Updated' : 'Unchanged');
 
-/* Collapsed accordion above the grid: this version's changes. */
-function renderNotes(i){
-  const v = DATA.versions[i], box = document.getElementById('notes');
-  const changed = v.anims.filter(a => a.status === 'new' || a.status === 'changed');
-  const sum = el('summary');
-  sum.append(el('b', null, 'What changed in ' + v.label),
-    el('span', null, v.vs ? (changed.length ? changed.length + ' of ' + v.anims.length + ' animations' : 'nothing') + ' vs ' + v.vs + (v.summary ? ' · ' + v.summary : '')
-                          : 'Oldest version kept here'));
-  sum.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>');
-  const body = el('div', 'notes-body');
-  body.append(el('span', 'note-k', 'Summary'), editable(() => v.summary, 'No summary yet.',
-    summary => saveNote({ version: v.label, summary }).then(() => { v.summary = summary.trim(); renderNotes(i); box.open = true; })));
-  const wasOpen = box.open && box.dataset.v === v.label;
-  box.replaceChildren(sum, body);
-  box.dataset.v = v.label;
-  box.open = wasOpen;
-  if (!v.vs) return;
+const older = def => def.anim.versions[def.anim.versions.indexOf(def) + 1];
 
-  const vs = el('div', 'notes-vs', 'Compared with'), back = el('button', null, v.vs + ' →');
-  back.onclick = () => select(i + 1);
-  vs.appendChild(back);
-  const ul = el('ul');
-  for (const a of changed) {
-    const li = changeNote(a), head = el('div', 'note-head'), open = el('button', null, a.name);
-    open.title = 'Open large';
-    open.onclick = () => openSheet(cards.find(x => x.def === a));
-    head.append(open, badge(a.status));
-    li.prepend(head);
-    ul.appendChild(li);
+/* One version's changelog note, the changes build.py detected vs the version before it, and its downloads. */
+function versionNote(def, onSaved){
+  const li = el('li', 'note'), prev = older(def);
+  li.appendChild(noteField(() => def.note, note => saveNote({ name: def.name, version: def.v, note }).then(() => { def.note = note.trim(); onSaved?.(); }),
+    'No changelog note for ' + def.v + ' yet.'));
+  li.appendChild(el('span', 'note-k', prev ? 'Detected vs ' + prev.v : 'First version'));
+  if (prev) {
+    const ol = el('ol', 'detected');
+    def.what.forEach(w => ol.appendChild(el('li', null, w)));
+    li.appendChild(ol);
   }
-  body.append(vs, ul);
-  const same = v.anims.length - changed.length;
-  const foot = [same && same + ' unchanged from ' + v.vs, v.removed.length && 'Removed: ' + v.removed.join(', ')].filter(Boolean);
-  if (foot.length) body.appendChild(el('p', 'notes-foot', foot.join(' · ')));
-}
-
-let cur = 0;
-function select(i){
-  cur = i;
-  const v = DATA.versions[i], items = [...toc.querySelectorAll('.toc-item')];
-  items.forEach((x, j) => x.setAttribute('aria-current', String(j === i)));
-  renderNotes(i);
-  document.getElementById('verTitle').textContent = v.label;
-  document.getElementById('verDl').replaceChildren(...(v.downloads || []).map(d => {
-    const a = document.createElement('a');
-    a.className = 'btn'; a.href = d.href; a.download = ''; a.textContent = '↓ ' + d.label;
-    return a;
-  }));
-  build(v.anims);
+  const dl = el('div', 'var-dl');
+  for (const [label, href] of [['JSON', def.json], ['dotLottie', def.lottie]]) {
+    if (!href) continue;
+    const a = el('a', 'btn', '↓ ' + label);
+    a.href = href; a.download = def.name + ' ' + def.v + (label === 'JSON' ? '.json' : '.lottie');
+    dl.appendChild(a);
+  }
+  li.appendChild(dl);
+  return li;
 }
 
 /* ---------------- large view ---------------- */
 
 let sheet = null;
+
+/* Several lottie instances driven as one, so the transport and keyboard
+   controls work unchanged in the All cards view. Reads come from the first. */
+function group(anims){
+  const g = anims.g = {
+    get isPaused(){ return anims[0].isPaused; }, get currentFrame(){ return anims[0].currentFrame; },
+    get totalFrames(){ return anims[0].totalFrames; }, get frameRate(){ return anims[0].frameRate; },
+    get loop(){ return anims[0].loop; }, set loop(v){ anims.forEach(a => a.loop = v); },
+    addEventListener: (ev, fn) => anims[0].addEventListener(ev, fn)
+  };
+  for (const m of ['play', 'pause', 'goToAndStop', 'goToAndPlay', 'destroy']) g[m] = (...args) => anims.forEach(a => a[m](...args));
+  return g;
+}
+
+const samples = new Map();
+const sampleImg = p => {
+  if (!samples.has(p)) samples.set(p, new Promise(r => { const i = new Image(); i.onload = () => r(i); i.onerror = () => r(null); i.src = p; }));
+  return samples.get(p);
+};
 
 /* Large view. The right panel lists this animation's variations across
    versions; picking one swaps the preview in place and shows its notes. */
@@ -672,45 +679,82 @@ function openSheet(c){
     `<div class="sheet" role="dialog" aria-modal="true">
        <div class="sheet-head">
          <h3></h3>
+         <div class="seg" role="group" aria-label="Card images">
+           <button data-mode="one">One card</button>
+           <button data-mode="all">All cards</button>
+         </div>
          <span class="pill"></span>
+         <button class="btn icon" data-full aria-label="Full screen" title="Full screen (f)"></button>
          <button class="btn icon" data-close aria-label="Close">
            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
          </button>
        </div>
        <div class="sheet-body">
-         <div class="sheet-main"><div class="stage"><div class="mount"></div></div></div>
-         <aside class="vars" aria-label="Variations"><span class="vars-k">Variations</span><ul class="vars-list"></ul><div class="vars-note"></div></aside>
+         <div class="sheet-main"><div class="view"></div></div>
+         <aside class="vars" aria-label="Versions"><span class="vars-k">Versions</span><ul class="vars-list"></ul><div class="vars-note"></div></aside>
        </div>
      </div>`;
   document.body.appendChild(o);
   sheet = { o, anim: null, ui: null, card: c };
+  const fullBtn = o.querySelector('[data-full]');
+  sheet.setFull = on => {
+    state.full = on;
+    o.classList.toggle('full', on);
+    fullBtn.setAttribute('aria-pressed', String(on));
+    fullBtn.setAttribute('aria-label', on ? 'Exit full screen' : 'Full screen');
+    fullBtn.innerHTML = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
+      (on ? '<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/>' : '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>') + '</svg>';
+  };
+  sheet.setFull(!!state.full);
+  fullBtn.onclick = () => sheet.setFull(!state.full);
 
-  const list = o.querySelector('.vars-list');
-  const show = def => {
+  const list = o.querySelector('.vars-list'), view = o.querySelector('.view');
+  let cur = c.def, token = 0;
+  const show = async def => {
+    cur = def;
+    const t = ++token, mode = state.mode || 'one', all = mode === 'all';
+    o.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+    const imgs = all ? await Promise.all(DATA.samples.map(sampleImg)) : [state.img];
+    if (t !== token || sheet?.o !== o) return;          // a newer switch (or close) won the race
     if (sheet.anim) sheet.anim.destroy();
     const d = def.data, total = d.op - d.ip;
-    o.querySelector('h3').textContent = def.name + ' · ' + VER.get(def).label;
+    o.querySelector('h3').textContent = def.name + ' · ' + def.v;
     o.querySelector('.pill').textContent = `${d.w}×${d.h} · ${Math.round(total)}f @ ${d.fr}fps · ${fmt(total / d.fr)}`;
     list.querySelectorAll('.var').forEach(b => b.setAttribute('aria-pressed', String(b.def === def)));
-    o.querySelector('.vars-note').replaceChildren(el('span', 'vars-k', 'Notes'), changeNote(def));
-    sheet.anim = lottie.loadAnimation({
-      container: o.querySelector('.mount'), renderer: 'svg', loop: c.loop, autoplay: true,
-      animationData: withImage(def),
-      rendererSettings: { preserveAspectRatio: 'xMidYMid meet' }
+    o.querySelector('.vars-note').replaceChildren(el('span', 'vars-k', 'Changelog · ' + def.v),
+      versionNote(def, () => { const b = [...list.querySelectorAll('.var')].find(b => b.def === def); if (b) b.querySelector('small').textContent = firstLine(def); }));
+    view.replaceChildren();
+    const grid = all ? view.appendChild(el('div', 'allgrid')) : view;
+    const anims = imgs.map((img, i) => {
+      const stage = el('div', 'stage'), mount = stage.appendChild(el('div'));
+      if (all) {
+        const fig = grid.appendChild(el('figure'));
+        fig.append(stage, el('figcaption', null, DATA.samples[i].split('/').pop().replace(/\.png$/, '')));
+      } else grid.appendChild(stage);
+      return lottie.loadAnimation({
+        container: mount, renderer: 'svg', loop: c.loop, autoplay: !all,
+        animationData: withImage(def, img),
+        rendererSettings: { preserveAspectRatio: 'xMidYMid meet' }
+      });
     });
+    sheet.anim = all ? group(anims) : anims[0];
+    if (all) Promise.all(anims.map(a => a.isLoaded ? 0 : new Promise(r => a.addEventListener('DOMLoaded', r))))
+      .then(() => { if (sheet?.anim === anims.g) anims.g.goToAndPlay(0, true); });   // start together
     for (const ev of ['enterFrame', 'complete', 'DOMLoaded']) sheet.anim.addEventListener(ev, sheet.ui.sync);
   };
+  o.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { state.mode = b.dataset.mode; show(cur); });
 
-  for (const def of variations(c.def)) {
+  const firstLine = def => (def.note || '').split('\n')[0];
+  for (const def of c.def.anim.versions) {
     const b = el('button', 'var');
     b.def = def;
-    b.append(el('b', null, VER.get(def).label), el('small', null, def.name === c.def.name ? '' : def.name));
-    if (def.status) b.appendChild(badge(def.status));
+    b.append(el('b', null, def.v), el('small', null, firstLine(def)));
+    if (def === c.def.anim.versions[0]) b.appendChild(el('span', 'badge new', 'Latest'));
     b.onclick = () => show(def);
     const li = el('li'); li.appendChild(b); list.appendChild(li);
   }
 
-  sheet.ui = transport(o.querySelector('.sheet-main'), () => sheet.anim, {
+  sheet.ui = transport(o.querySelector('.sheet-main'), () => sheet?.anim, {   // a queued redraw can land after close
     onLoop(v){ c.loop = v; sheet.anim.loop = v; c.anim.loop = v; c.ui.sync();
                if (v && sheet.anim.isPaused) sheet.anim.play(); }
   });
@@ -729,6 +773,7 @@ addEventListener('keydown', e => {
   if (!sheet || e.target.closest('textarea')) return;
   const a = sheet.anim;
   if (e.key === 'Escape') closeSheet();
+  else if (e.key === 'f' && !e.metaKey && !e.ctrlKey) sheet.setFull(!state.full);
   else if (e.key === ' ') { e.preventDefault(); a.isPaused ? a.play() : a.pause(); sheet.ui.sync(); }
   else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
     e.preventDefault();
@@ -744,6 +789,7 @@ const reloadAll = () => {
   closeSheet();
   cards.forEach(c => c.load());
   if (reopen) openSheet(reopen);
+  if (pv.anim) pvLoad(!pv.anim.isPaused);
 };
 
 document.getElementById('playAll').onclick  = () => cards.forEach(c => { c.anim.play();  c.ui.sync(); });
@@ -814,17 +860,161 @@ sampleMenu.addEventListener('keydown', e => {
   else if (e.key === 'Escape') { e.stopPropagation(); toggleMenu(false); sampleBtn.focus(); }
 });
 
-document.getElementById('reset').onclick = () => {
-  state.img = state.pending = null; markSample(null);
+/* Default card: the production card (IDCARDS/default.*, see build.py) when present, else the generated placeholder. */
+let DEFAULT_IMG = null;
+function useDefault(){
+  state.img = DEFAULT_IMG; state.pending = null; markSample(DATA.default);
   hint.textContent = HINT; applyBtn.disabled = true;
-  document.getElementById('imgName').textContent = 'Placeholder card';
-  document.getElementById('imgDim').textContent = 'generated';
-  thumb.src = placeholderCard(184, 120);
-  reloadAll();
+  document.getElementById('imgName').textContent = DEFAULT_IMG ? 'Default card' : 'Placeholder card';
+  document.getElementById('imgDim').textContent = DEFAULT_IMG ? DEFAULT_IMG.naturalWidth + '×' + DEFAULT_IMG.naturalHeight : 'generated';
+  thumb.src = DEFAULT_IMG ? DEFAULT_IMG.src : placeholderCard(184, 120);
+}
+document.getElementById('reset').onclick = () => { useDefault(); reloadAll(); };
+document.getElementById('reset').title = document.getElementById('reset').ariaLabel = DATA.default ? 'Reset to default card' : 'Reset to placeholder';
+document.getElementById('verDl').replaceChildren(...DATA.downloads.map(d => {
+  const a = el('a', 'btn', '↓ ' + d.label);
+  a.href = d.href; a.download = '';
+  return a;
+}));
+(DATA.default ? sampleImg(DATA.default) : Promise.resolve(null)).then(img => {
+  DEFAULT_IMG = img; useDefault();
+  if (SHOT) return pvShot();
+  build(DATA.anims.map(a => a.versions[0]));
+  setTab(location.hash === '#preview' ? 'preview' : 'anims');
+});
+fetch('__edit').then(r => { if (r.status === 204) EDIT = true; }).catch(() => {});
+
+/* ---------------- Preview tab: the Figma retake flow ----------------
+   Screens 1123:14315 (processing) → 1123:14385 (error) → 1123:14440 (drawer), built 1:1 in Figma px.
+   The captured photo is Figma's sample; only the drawer's Lottie takes the picked card. */
+
+const PV = 'preview/assets/';
+const pvChrome = () =>
+  `<div class="pv-status"><img class="pv-notch" src="${PV}notch.svg" alt=""><img class="pv-time" src="${PV}status-time.svg" alt="9:41"><img class="pv-right" src="${PV}status-right.svg" alt=""></div>
+   <div class="pv-top"><span><span class="pv-back"><img src="${PV}arrow-left.svg" alt="Back"></span></span><span></span><span></span></div>
+   <div class="pv-foot"><span class="pv-by"><span class="pv-shield"><img src="${PV}security.svg" alt=""></span><span>powered by HyperVerge</span></span></div>
+   <div class="pv-home"><i></i></div>`;
+const pvScreen = (cls, title, overlay) =>
+  `<div class="pv-screen ${cls}">${pvChrome()}
+     <div class="pv-col"><div class="pv-title">${title}</div>
+       <div class="pv-photo"><img class="pv-img" src="${PV}img-2611.png" alt=""><i class="pv-tint"></i>${overlay}</div></div>
+   </div>`;
+
+const pv = { root: document.getElementById('pv'), anim: null, step: 'processing', timers: [] };
+pv.root.innerHTML =
+  pvScreen('pv-processing', 'Processing...', `<span class="pv-spin"><img src="${PV}spinner-track.svg" alt=""><img src="${PV}spinner-arc.svg" alt=""></span>`) +
+  pvScreen('pv-error', 'There seems to be an issue', `<img class="pv-badge" src="${PV}error-56.svg" alt="">`) +
+  `<div class="pv-sheetwrap"><div class="pv-sheet" role="dialog">
+     <div class="pv-sheet-body">
+       <div class="pv-head"><span class="pv-head-t"></span><span class="pv-speak"><img src="${PV}volume-up.svg" alt="Play audio"></span></div>
+       <div class="pv-media"><div class="pv-lottie"></div></div>
+       <div class="pv-btns"><span class="pv-btn"><span>Retake Selfie</span></span></div>
+     </div>
+     <div class="pv-home"><i></i></div>
+   </div></div>`;
+
+const pvAnimSel = document.getElementById('pvAnim'), pvVerSel = document.getElementById('pvVer');
+for (const a of DATA.anims) pvAnimSel.add(new Option(a.name));
+if (DATA.anims.some(a => a.name === 'PartialID')) pvAnimSel.value = 'PartialID';   // the animation in the Figma drawer
+const pvVersions = () => {
+  const a = DATA.anims.find(a => a.name === pvAnimSel.value);
+  pvVerSel.replaceChildren(...a.versions.map((v, i) => new Option(v.v + (i ? '' : ' (latest)'), i)));
 };
-thumb.src = placeholderCard(184, 120);
-select(0);
-fetch('__edit').then(r => { if (r.status === 204) { EDIT = true; renderNotes(cur); } }).catch(() => {});
+pvVersions();
+const pvDef = () => DATA.anims.find(a => a.name === pvAnimSel.value).versions[+pvVerSel.value];
+
+function pvLoad(play){
+  const def = pvDef();
+  if (pv.anim) pv.anim.destroy();
+  pv.root.querySelector('.pv-head-t').textContent = { ...DATA.errors._default, ...DATA.errors[def.name] }.title;
+  return pv.anim = lottie.loadAnimation({
+    container: pv.root.querySelector('.pv-lottie'), renderer: 'svg', loop: true, autoplay: play,
+    animationData: withImage(def, state.img),
+    rendererSettings: { preserveAspectRatio: 'xMidYMid slice' }   // canvas is 2× the box incl. its stroke ring
+  });
+}
+
+/* `animate` turns on the Figma transitions; without it a step change is instant. */
+function pvStep(step, animate){
+  pv.step = step;
+  pv.root.classList.toggle('pv-anim', !!animate);
+  pv.root.dataset.step = step;
+  document.querySelectorAll('#pvJump button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.step === step)));
+}
+const pvStop = () => { pv.timers.forEach(clearTimeout); pv.timers = []; };
+
+/* Figma prototype: after 0.8 s dissolve to error (300 ms ease-out); 0.75 s after that settles,
+   slide the sheet up (800 ms ease-in-back); the Lottie starts once it lands. */
+function pvPlay(){
+  pvStop();
+  if (pv.anim) { pv.anim.destroy(); pv.anim = null; }
+  pvStep('processing');
+  pv.root.offsetWidth;                                  // commit the reset before transitions are re-enabled
+  const at = (ms, fn) => pv.timers.push(setTimeout(fn, ms));
+  at(800, () => { pvStep('error', true); pvLoad(false); });
+  at(800 + 300 + 750, () => pvStep('drawer', true));
+  at(800 + 300 + 750 + 800, () => { pv.timers = []; pv.anim.goToAndPlay(0, true); });
+}
+
+function pvJump(step){
+  pvStop();
+  pvStep(step);
+  if (step === 'drawer') pvLoad(true);
+  else if (pv.anim) pv.anim.goToAndStop(0, true);
+}
+
+/* Scale the 375×812 frame to fit the window below the picker and controls (at scroll 0); never upscale. */
+function pvFit(){
+  const top = pv.root.parentElement.parentElement.getBoundingClientRect().top + scrollY;
+  pv.root.parentElement.style.setProperty('--k', Math.max(.5, Math.min(1, (innerHeight - top - 24) / 812)));
+}
+
+pvAnimSel.onchange = () => { pvVersions(); pvVerSel.onchange(); };
+pvVerSel.onchange = () => { if (pv.anim) pvLoad(pv.step === 'drawer' && !pv.timers.length); };
+document.getElementById('pvPlay').onclick = pvPlay;
+document.querySelectorAll('#pvJump button').forEach(b => b.onclick = () => pvJump(b.dataset.step));
+addEventListener('resize', () => { if (state.tab === 'preview') pvFit(); });
+
+/* Top-level tabs. Grid animations pause while Preview is showing and resume on return. */
+function setTab(tab){
+  if (tab === state.tab) return;
+  state.tab = tab;
+  document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tab === tab)));
+  document.getElementById('tabAnims').hidden = tab !== 'anims';
+  document.getElementById('tabPreview').hidden = tab !== 'preview';
+  document.getElementById('loopSeg').hidden = tab !== 'anims';
+  history.replaceState(null, '', tab === 'preview' ? '#preview' : location.pathname + location.search);
+  if (tab === 'preview') {
+    cards.forEach(c => { c.resume = !c.anim.isPaused; c.anim.pause(); c.ui.sync(); });
+    pvFit();
+    pvPlay();
+  } else {
+    pvStop();
+    if (pv.anim) pv.anim.pause();
+    cards.forEach(c => { if (c.resume) c.anim.play(); c.ui.sync(); });
+  }
+}
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+
+/* ?shot=processing|error|drawer[&anim=&v=&frame=]: one static screen at 1:1; sets html[data-ready] when painted. */
+const SHOT = new URLSearchParams(location.search).get('shot');
+if (SHOT) document.documentElement.classList.add('shot');
+function pvShot(){
+  const q = new URLSearchParams(location.search);
+  if (q.get('anim')) { pvAnimSel.value = q.get('anim'); pvVersions(); }
+  const vi = pvDef().anim.versions.findIndex(v => v.v === q.get('v'));
+  if (vi >= 0) pvVerSel.value = vi;
+  document.getElementById('tabAnims').hidden = true;
+  document.getElementById('tabPreview').hidden = false;
+  pvStep(SHOT);
+  let lottieReady = null;
+  if (SHOT === 'drawer') {
+    const a = pvLoad(false);
+    lottieReady = new Promise(r => a.addEventListener('DOMLoaded', () => { a.goToAndStop(+q.get('frame') || 0, true); r(); }));
+  }
+  Promise.all([document.fonts.ready, ...[...pv.root.querySelectorAll('img')].map(i => i.decode().catch(() => {})), lottieReady])
+    .then(() => requestAnimationFrame(() => { document.documentElement.dataset.ready = 1; }));
+}
 
 /* drop an image anywhere on the page */
 addEventListener('dragover', e => e.preventDefault());

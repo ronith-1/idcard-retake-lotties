@@ -2,7 +2,7 @@
 
 Serves the folder like `python3 -m http.server`, plus:
   GET  /__edit  -> 204, tells the page to show edit controls (404 on any static host, e.g. Vercel)
-  POST /__notes -> {"version", "summary"} or {"version", "name", "why"}; writes notes.json and reruns build.py
+  POST /__notes -> {"name", "version", "note"}; writes notes.json and reruns build.py
 Binds to 127.0.0.1 only, so nothing else on the network can reach it.
 """
 import http.server, json, os, subprocess, sys
@@ -12,23 +12,15 @@ NOTES = os.path.join(ROOT, "notes.json")
 
 
 def apply(notes, body):
-    """Merge one edit into the notes dict. Raises ValueError on a malformed edit."""
-    version = body.get("version")
-    if not isinstance(version, str) or not version:
-        raise ValueError("version required")
-    entry = notes.setdefault(version, {"summary": "", "why": {}})
-    if "summary" in body:
-        if not isinstance(body["summary"], str):
-            raise ValueError("summary must be text")
-        entry["summary"] = body["summary"].strip()
-    elif isinstance(body.get("name"), str) and isinstance(body.get("why"), str):
-        why = entry.setdefault("why", {})
-        if body["why"].strip():
-            why[body["name"]] = body["why"].strip()
-        else:
-            why.pop(body["name"], None)
+    """Set one animation version's changelog note. Raises ValueError on a malformed edit."""
+    name, version, note = body.get("name"), body.get("version"), body.get("note")
+    if not (isinstance(name, str) and name and isinstance(version, str) and version and isinstance(note, str)):
+        raise ValueError("send name, version and note")
+    entry = notes.setdefault(name, {})
+    if note.strip():
+        entry[version] = note.strip()
     else:
-        raise ValueError("send summary, or name + why")
+        entry.pop(version, None)
     return notes
 
 
@@ -65,11 +57,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     if sys.argv[1:] == ["test"]:
-        n = apply({}, {"version": "v9", "summary": " s "})
-        n = apply(n, {"version": "v9", "name": "A", "why": " because "})
-        assert n == {"v9": {"summary": "s", "why": {"A": "because"}}}, n
-        assert apply(n, {"version": "v9", "name": "A", "why": ""})["v9"]["why"] == {}
-        for bad in ({}, {"version": "v9"}, {"version": "v9", "summary": 3}):
+        n = apply({}, {"name": "A", "version": "v2", "note": " because "})
+        assert n == {"A": {"v2": "because"}}, n
+        assert apply(n, {"name": "A", "version": "v2", "note": ""}) == {"A": {}}
+        for bad in ({}, {"name": "A"}, {"name": "A", "version": "v1"}, {"name": "A", "version": "v1", "note": 3}):
             try: apply({}, bad); raise AssertionError(bad)
             except ValueError: pass
         print("ok")
